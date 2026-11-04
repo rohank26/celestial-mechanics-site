@@ -1,0 +1,69 @@
+{
+  "hero": {
+    "preheader": "Celestial Mechanics · Design Studio",
+    "heading": "The heavens, commissioned.",
+    "lead": "We design and hand-build immersive, life-sized orreries: working models of the solar system you can stand beside, walk around and set in motion. Each one is made for a single place and a single patron, and never made again.",
+    "primaryButton": "Begin a commission",
+    "secondaryButton": "See the add-ons"
+  },
+  "experience": {
+    "preheader": "The experience",
+    "heading": "A working sky, at the scale of a room",
+    "body": "An orrery is a three-hundred-year-old idea: the planets, carried around the Sun by mechanism, each at its own pace. We build them large enough to inhabit. The planets really move, the light is real, and the effect on the people who stand beneath it is something we never tire of watching. As humanity turns its attention back to the stars, there has never been a better moment to bring the solar system indoors.",
+    "caption": "Illustrative: eight worlds, each turning at its own pace."
+  },
+  "audiences": {
+    "preheader": "Made for",
+    "heading": "One orrery. Three kinds of home.",
+    "residence": {
+      "title": "Residences",
+      "text": "A conversational centrepiece for the great room, the library or the garden. The object every guest remembers.",
+      "link": "For residences"
+    },
+    "institution": {
+      "title": "Institutions",
+      "text": "For museums, planetariums, universities and public spaces: an immersive lesson that sparks a lifetime of curiosity.",
+      "link": "For institutions"
+    },
+    "business": {
+      "title": "Businesses",
+      "text": "For hotels, galleries, gardens and headquarters: interactive art that reflects what you stand for.",
+      "link": "For businesses"
+    }
+  },
+  "bespoke": {
+    "preheader": "Made, not manufactured",
+    "heading": "No two alike",
+    "body": "We don't keep a catalogue. Every Celestial Mechanics orrery begins with your space and your story, and is drawn, machined and assembled for you alone. These are the choices we shape together:",
+    "items": [
+      { "title": "The system", "text": "A Tellurion of Earth, Moon and Sun; the four inner planets; or a Grand Orrery of all eight, with Pluto as a bonus." },
+      { "title": "The planets", "text": "Mini, small or large, in lightweight plastic or hand-blown glass." },
+      { "title": "The mechanism", "text": "An individual motor and belt for each world, or a single drive through mechanical gearing." },
+      { "title": "The Sun", "text": "A luminous sphere, or a living, propane-fed fireball." }
+    ],
+    "button": "Sketch your orrery"
+  },
+  "process": {
+    "preheader": "The commission",
+    "heading": "How an orrery comes to be",
+    "steps": [
+      { "title": "Conversation", "text": "We learn about your space, the people who will gather there and what you'd like them to feel." },
+      { "title": "Design", "text": "We return with drawings and a proposal tailored to you: scale, materials, mechanism and finish." },
+      { "title": "Making", "text": "Your orrery is hand-built in our studio, every arm, gear and planet made for this piece alone." },
+      { "title": "Installation", "text": "We install it, set it in motion and show you how to make the heavens your own." }
+    ]
+  },
+  "grandOrrery": {
+    "preheader": "Our first piece",
+    "heading": "The Grand Orrery",
+    "body": "Eight planets carried around the Sun beneath a dome of light: the piece that started the studio. It has captivated festival crowds in California and British Columbia, and it still travels to festivals and events.",
+    "button": "Visit The Grand Orrery",
+    "image": "/images/cm/home/grand-orrery.jpg",
+    "imageAlt": "Guests lying beneath the dome of The Grand Orrery, gazing up at the glowing planets"
+  },
+  "closing": {
+    "heading": "Every orrery begins with a conversation.",
+    "text": "Tell us about your space. We'll take it from there.",
+    "button": "Begin a commission"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "preheader": "For institutions",
+  "heading": "Curiosity, set in motion",
+  "lead": "For museums, planetariums, universities, libraries and public spaces. A life-sized orrery turns the solar system from a diagram into a place: visitors walk among the planets, watch them move and leave with questions they'll be asking for years.",
+  "pointsHeading": "An education you can stand inside",
+  "points": [
+    { "title": "Learn by being there", "text": "Scale, motion and distance become something felt rather than read. The planets really move, each at its own pace around the Sun.", "icon": "learn" },
+    { "title": "A layer of knowledge with Aurora", "text": "Our augmented-reality add-on reveals orbits, names, celestial objects and stories about every world, right over the real thing.", "icon": "aurora" },
+    { "title": "A programme for every visit", "text": "With the Planetary Controller, educators can run motion scenes, recreate the sky on historic dates and light each planet in turn.", "icon": "controller" }
+  ],
+  "settingsHeading": "Where it belongs",
+  "settings": ["Museums", "Planetariums and science centres", "Universities and research libraries", "Schools", "Civic and public spaces"],
+  "startingPoint": {
+    "heading": "A starting point",
+    "text": "One of the configurations we'd suggest for a public collection. Use it as inspiration, or as the first sketch of your own.",
+    "configuration": "The Observatory"
+  },
+  "closing": {
+    "heading": "Spark a lifetime of wonder.",
+    "text": "Tell us about your visitors and your space.",
+    "button": "Begin a commission"
+  }
+}

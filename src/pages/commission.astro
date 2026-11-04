@@ -1,0 +1,516 @@
+---
+// Commission page: the builder (pick the system, planets, mechanism, sun and
+// add-ons, with a live engraved drawing) and the enquiry form, which sends the
+// sketch along with the message. Wording is edited in the CMS under
+// Pages → Commission (src/content/cm/commission.json).
+//
+// Shareable: the sketch is kept in the address (?c=…), and ?for=residence |
+// institution | business preselects who the enquiry is for.
+import Layout from '../components/cm/Layout.astro';
+import { planSVG, elevationSVG } from '../cm/drawing';
+import { DEFAULT_CONFIG, GROUP_IDS, GROUPS, SETTINGS, DOME_MOUNTS } from '../cm/options';
+import { describe } from '../cm/describe';
+import d from '../content/cm/commission.json';
+import addons from '../content/cm/addons.json';
+import home from '../content/cm/home.json';
+
+type Opt = { label: string; text: string };
+const groups = d.groups as unknown as Record<string, { title: string; intro: string; options: Record<string, Opt> }>;
+const setting = d.setting as { title: string; intro: string; options: Record<string, Opt> };
+const items = addons.items as Record<string, { name: string; tagline: string; note?: string }>;
+const c = DEFAULT_CONFIG;
+const rows = describe(c);
+const stepNo = (i: number) => ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'][i];
+---
+<Layout title="Commission" current="commission" description={d.lead}>
+  <main>
+    <section class="cm-hero commission-hero" aria-labelledby="page-title">
+      <div class="wrap">
+        <div class="copy">
+          <p class="eyebrow">{d.preheader}</p>
+          <h1 id="page-title" class="h1">{d.heading}</h1>
+          <p class="lead">{d.lead}</p>
+        </div>
+      </div>
+    </section>
+
+    <div id="builder" class="builder-band">
+      <form class="wrap builder" data-builder aria-label="Orrery builder" onsubmit="return false">
+        <div class="steps">
+          <fieldset class="step">
+            <legend><span class="num">{stepNo(0)}</span>{setting.title}</legend>
+            <div class="choices two">
+              {SETTINGS.map((id) => (
+                <label class="choice">
+                  <input type="radio" name="setting" value={id} checked={c.setting === id} />
+                  <span class="t">{setting.options[id].label}</span>
+                  <span class="d">{setting.options[id].text}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          {GROUP_IDS.map((g, gi) => (
+            <fieldset class="step">
+              <legend><span class="num">{stepNo(gi + 1)}</span>{groups[g].title}</legend>
+              {groups[g].intro && <p class="intro">{groups[g].intro}</p>}
+              <div class:list={['choices', GROUPS[g].length === 2 ? 'two' : 'three']}>
+                {GROUPS[g].map((id) => (
+                  <label class="choice">
+                    <input type="radio" name={g} value={id} checked={(c as unknown as Record<string, string>)[g] === id} />
+                    <span class="t">{groups[g].options[id].label}</span>
+                    <span class="d">{groups[g].options[id].text}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))}
+
+          <fieldset class="step">
+            <legend><span class="num">{stepNo(GROUP_IDS.length + 1)}</span>{d.addonsTitle}</legend>
+            {d.addonsIntro && <p class="intro">{d.addonsIntro}</p>}
+            <div class="choices addons">
+              {(['controller', 'aurora', 'dome', 'pavilion'] as const).map((id) => (
+                <div class="addon-wrap" data-addon={id}>
+                  <label class="choice check">
+                    <input type="checkbox" name={id} checked={(c as unknown as Record<string, boolean>)[id]} />
+                    <span class="t">{items[id].name}</span>
+                    <span class="d">{items[id].tagline}{items[id].note ? ` ${items[id].note}` : ''}</span>
+                  </label>
+                  {id === 'dome' && (
+                    <div class="mount" data-mount hidden>
+                      <span class="mount-title">{d.domeMount.title}</span>
+                      {DOME_MOUNTS.map((m) => (
+                        <label class="pill">
+                          <input type="radio" name="domeMount" value={m} checked={c.domeMount === m} />
+                          <span>{(d.domeMount.options as Record<string, Opt>)[m].label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p class="hint" data-hint role="status" aria-live="polite"></p>
+          </fieldset>
+        </div>
+
+        <aside id="sketch" class="panel" aria-labelledby="sketch-title">
+          <div class="frame">
+            <div class="inner">
+              <div class="panel-head">
+                <h2 id="sketch-title" class="panel-title">{d.summary.heading}</h2>
+                <div class="tabs" role="tablist" aria-label="Drawing view">
+                  <button type="button" role="tab" aria-selected="true" data-view="elevation">{d.summary.elevation}</button>
+                  <button type="button" role="tab" aria-selected="false" data-view="plan">{d.summary.plan}</button>
+                </div>
+              </div>
+              <div class="drawing preview" data-preview role="img" aria-label="Engraved drawing of your orrery">
+                <div data-elevation><Fragment set:html={elevationSVG(c, 'live-e')} /></div>
+                <div data-plan hidden><Fragment set:html={planSVG(c, 'live-p')} /></div>
+              </div>
+              <p class="caption small">{d.summary.caption}</p>
+              <dl class="spec" data-spec>
+                {rows.map((r) => <div><dt>{r.label}</dt><dd>{r.value}</dd></div>)}
+              </dl>
+              <div class="panel-actions">
+                <a class="btn btn--solid" href="#enquire" data-enquire>{d.summary.button}</a>
+                <div class="small-actions">
+                  <button type="button" class="link-btn" data-share>{d.summary.share}</button>
+                  <button type="button" class="link-btn" data-reset>{d.summary.reset}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </form>
+      <div class="mobile-bar" data-mobile-bar hidden>
+        <p class="mb-line" data-mobile-line></p>
+        <a class="btn" href="#sketch">View sketch</a>
+      </div>
+    </div>
+
+    <section id="enquire" class="section section--raised enquire" aria-labelledby="enquire-title">
+      <div class="wrap row">
+        <div class="copy">
+          <p class="eyebrow">{d.form.preheader}</p>
+          <h2 id="enquire-title" class="h2">{d.form.heading}</h2>
+          <p class="intro-text">{d.form.intro}</p>
+          <div class="sketch-box frame">
+            <div class="inner">
+              <p class="card-meta">{d.form.sketchLabel}</p>
+              <p class="sketch-line" data-sketch-line></p>
+              <label class="include"><input type="checkbox" form="enquiry" name="includeSketch" checked data-include /> Include my sketch with this enquiry</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-form">
+          <form id="enquiry" class="form" method="post" action="/api/contact" data-contact-form novalidate>
+            <div class="grid">
+              <label class="field">
+                <span>Name <b aria-hidden="true">*</b></span>
+                <input name="name" type="text" autocomplete="name" required maxlength="120" />
+              </label>
+              <label class="field">
+                <span>Email <b aria-hidden="true">*</b></span>
+                <input name="email" type="email" autocomplete="email" required maxlength="200" />
+              </label>
+              <label class="field">
+                <span>Phone</span>
+                <input name="phone" type="tel" autocomplete="tel" maxlength="40" />
+              </label>
+              <label class="field">
+                <span>This orrery is for</span>
+                <select name="type" data-for>
+                  <option value="">Choose one</option>
+                  <option value="residence">{home.audiences.residence.title.replace(/s$/, '')}: a home or garden</option>
+                  <option value="institution">{home.audiences.institution.title.replace(/s$/, '')}: a museum, school or public space</option>
+                  <option value="business">{home.audiences.business.title.replace(/es$/, '')}: a hotel, gallery or building</option>
+                  <option value="other">Something else</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Organisation</span>
+                <input name="organisation" type="text" autocomplete="organization" maxlength="160" />
+              </label>
+              <label class="field">
+                <span>Location</span>
+                <input name="location" type="text" placeholder="City, region" maxlength="160" />
+              </label>
+              <label class="field wide">
+                <span>Timeframe</span>
+                <input name="dates" type="text" placeholder="e.g. Spring 2027, or flexible" maxlength="160" />
+              </label>
+              <label class="field wide">
+                <span>Tell us about your space <b aria-hidden="true">*</b></span>
+                <textarea name="message" rows="5" required maxlength="5000" placeholder="The room or garden, who will gather there, what you'd like them to feel…"></textarea>
+              </label>
+            </div>
+            <input type="hidden" name="configuration" value="" data-config-text />
+            <input type="hidden" name="code" value="" data-config-code />
+            <div class="trap" aria-hidden="true">
+              <label>Website <input name="website" type="text" tabindex="-1" autocomplete="off" /></label>
+            </div>
+            <input type="hidden" name="t" value="" />
+            <div class="actions">
+              <button type="submit" class="btn btn--solid">{d.form.buttonText}</button>
+              <p class="status" role="status" aria-live="polite"></p>
+            </div>
+            <p class="caption required"><b aria-hidden="true">*</b> Required</p>
+          </form>
+
+          <div class="done" hidden tabindex="-1">
+            <svg aria-hidden="true" viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="#D8B25C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="24" cy="24" r="18" stroke-opacity="0.55" />
+              <path d="M16 24.5l5.5 5.5L33 18.5" stroke="#F2D78E" />
+            </svg>
+            <h3>{d.form.successHeading}</h3>
+            <p>{d.form.successText}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script is:inline define:vars={{ messages: d.messages, copied: d.summary.copied, share: d.summary.share }}>
+  window.__cmBuilderText = { messages, copied, share };
+</script>
+
+<style>
+  .commission-hero { padding-bottom: clamp(32px, 4vw, 56px); }
+  .builder-band { padding: clamp(40px, 5vw, 72px) var(--gutter); background: var(--veil); scroll-margin-top: 80px; }
+  .builder { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(32px, 4vw, 64px); align-items: start; }
+  @media (max-width: 60rem) {
+    .builder { grid-template-columns: minmax(0, 1fr); }
+    .panel { order: -1; }
+  }
+
+  .step { margin: 0 0 clamp(30px, 3.4vw, 44px); padding: 0; border: 0; min-width: 0; }
+  legend { display: flex; align-items: baseline; gap: 14px; padding: 0; margin-bottom: 8px; font-family: var(--display); font-weight: 500; font-size: 1.45rem; color: var(--cream); }
+  legend .num { font-size: 0.78rem; letter-spacing: 0.2em; color: var(--gold); min-width: 2.4em; }
+  .intro { margin: 0 0 14px; color: var(--text-muted); font-style: italic; font-size: 1rem; }
+  .choices { display: grid; gap: 12px; margin-top: 12px; }
+  .choices.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .choices.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .choices.addons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (max-width: 40rem) { .choices.three, .choices.addons { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 28rem) { .choices.two { grid-template-columns: minmax(0, 1fr); } }
+
+  .choice {
+    position: relative; display: flex; flex-direction: column; gap: 6px; height: 100%; box-sizing: border-box;
+    padding: 16px 18px 16px 44px; cursor: pointer;
+    border: 1px solid var(--bronze); background: rgba(7, 6, 5, 0.5);
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .choice:hover { border-color: var(--gold); }
+  .choice input { position: absolute; left: 17px; top: 19px; margin: 0; width: 16px; height: 16px; appearance: none; -webkit-appearance: none; border: 1px solid var(--gold); background: var(--ink); cursor: pointer; }
+  .choice input[type='radio'] { border-radius: 50%; }
+  .choice input:checked { background: radial-gradient(circle, var(--gold-light) 0 40%, var(--ink) 46%); }
+  .choice input[type='checkbox']:checked { background: var(--gold); box-shadow: inset 0 0 0 3px var(--ink); }
+  .choice input:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 3px; }
+  .choice:has(input:checked) { border-color: var(--gold-light); background: rgba(216, 178, 92, 0.08); box-shadow: inset 0 0 0 1px rgba(242, 215, 142, 0.25); }
+  .choice:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
+  .choice .t { font-family: var(--display); font-size: 1.02rem; letter-spacing: 0.02em; color: var(--gold-light); }
+  .choice .d { font-size: 0.98rem; line-height: 1.5; color: var(--text-soft); }
+
+  .addon-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .mount { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 0 2px; }
+  .mount[hidden] { display: none; }
+  .mount-title { width: 100%; font-family: var(--display); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); }
+  .pill { position: relative; }
+  .pill input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .pill span { display: inline-block; padding: 7px 12px; border: 1px solid var(--bronze); font-size: 0.95rem; color: var(--text-soft); transition: all 0.2s ease; }
+  .pill input:checked + span { border-color: var(--gold-light); color: var(--gold-light); background: rgba(216, 178, 92, 0.08); }
+  .pill input:focus-visible + span { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+  .hint { min-height: 1.6em; margin: 14px 0 0; font-style: italic; color: var(--gold-light); font-size: 1rem; }
+
+  .panel { position: sticky; top: 92px; scroll-margin-top: 80px; }
+  .panel .frame { background: rgba(7, 6, 5, 0.9); }
+  /* Phones: a slim bar keeps the sketch in reach while choosing options. */
+  .mobile-bar { display: none; }
+  @media (max-width: 60rem) {
+    .mobile-bar:not([hidden]) {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+      display: flex; align-items: center; gap: 14px; padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
+      background: rgba(5, 4, 3, 0.95); border-top: 1px solid var(--gold);
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    }
+    .mb-line { flex: 1; min-width: 0; margin: 0; font-size: 0.92rem; line-height: 1.35; color: var(--text-soft); }
+    .mobile-bar .btn { flex: none; min-height: 42px; padding: 0 14px; font-size: 0.72rem; }
+  }
+  @media (max-width: 60rem) { .panel { position: static; } }
+  .panel .inner { display: flex; flex-direction: column; gap: 14px; padding: clamp(18px, 2vw, 26px); }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .panel-title { margin: 0; font-family: var(--display); font-weight: 500; font-size: 1.4rem; color: var(--cream); }
+  .tabs { display: inline-flex; border: 1px solid var(--bronze); }
+  .tabs button { background: none; border: 0; padding: 8px 14px; min-height: 36px; font-family: var(--display); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); cursor: pointer; }
+  .tabs button[aria-selected='true'] { background: var(--gold); color: #120D06; }
+  .preview { width: 100%; max-width: 30rem; margin: 0 auto; }
+  .preview > div[hidden] { display: none; }
+  .small { margin: -6px 0 0; text-align: center; font-size: 0.9rem; }
+  .spec { margin: 4px 0 0; display: flex; flex-direction: column; }
+  /* The summary rows are redrawn by the script, so these rules are global. */
+  .spec :global(div) { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .spec :global(dt) { font-family: var(--display); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); padding-top: 3px; }
+  .spec :global(dd) { margin: 0; color: var(--text); font-size: 1rem; line-height: 1.45; }
+  @media (max-width: 26rem) { .spec :global(div) { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+  .panel-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  .small-actions { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .link-btn { background: none; border: 0; padding: 6px 0; font: inherit; font-size: 0.95rem; color: var(--gold-light); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; cursor: pointer; }
+  .link-btn:hover { color: var(--gold-pale); }
+
+  /* Enquiry */
+  .enquire { scroll-margin-top: 80px; }
+  .enquire .row { display: flex; flex-wrap: wrap; gap: clamp(40px, 6vw, 96px); align-items: flex-start; }
+  .enquire .copy { flex: 1 1 320px; min-width: 0; max-width: 30rem; display: flex; flex-direction: column; gap: 22px; }
+  .enquire .eyebrow { margin-bottom: -10px; }
+  .intro-text { margin: 0; color: var(--text-soft); }
+  .sketch-box .inner { display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; }
+  .sketch-line { margin: 0; color: var(--text); font-size: 1rem; line-height: 1.5; }
+  .include { display: flex; gap: 10px; align-items: center; font-size: 0.98rem; color: var(--text-soft); cursor: pointer; }
+  .include input { accent-color: #D8B25C; width: 16px; height: 16px; }
+  .panel-form { flex: 1.4 1 420px; min-width: 0; }
+
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 20px; }
+  .wide { grid-column: 1 / -1; }
+  @media (max-width: 36rem) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field > span { font-family: var(--display); font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .field b, .required b { color: var(--gold); font-weight: 400; }
+  .field input, .field textarea, .field select {
+    width: 100%; box-sizing: border-box; margin: 0; padding: 12px 14px; min-height: 48px;
+    font: inherit; font-size: 1.05rem; color: var(--text);
+    background: rgba(7, 6, 5, 0.6); border: 1px solid var(--bronze); border-radius: 0;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .field select { appearance: none; -webkit-appearance: none; padding-right: 40px; background-image: linear-gradient(45deg, transparent 50%, #D8B25C 50%), linear-gradient(135deg, #D8B25C 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
+  .field select option { background: #0D0A06; color: var(--text); }
+  .field textarea { resize: vertical; min-height: 140px; line-height: 1.5; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--text-faint); opacity: 0.75; }
+  .field input:hover, .field textarea:hover, .field select:hover { border-color: var(--gold); }
+  .field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--gold-light); background-color: rgba(7, 6, 5, 0.85); }
+  .field input:focus-visible, .field textarea:focus-visible, .field select:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+  .field.invalid input, .field.invalid textarea { border-color: #C9714F; }
+  .trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 24px; }
+  .status { margin: 0; color: var(--text-muted); font-size: 1rem; }
+  .status.error { color: #E39B7B; }
+  .required { margin: 14px 0 0; font-size: 0.9rem; }
+  .btn[disabled] { opacity: 0.6; cursor: progress; }
+  .done { display: flex; flex-direction: column; gap: 14px; padding: clamp(28px, 4vw, 44px); border: 1px solid var(--bronze); background: rgba(7, 6, 5, 0.45); }
+  .done[hidden] { display: none; }
+  .done h3 { margin: 0; font-family: var(--display); font-weight: 500; font-size: 1.6rem; color: var(--gold-light); }
+  .done p { margin: 0; color: var(--text-soft); }
+  .done:focus { outline: none; }
+</style>
+
+<script>
+  import { planSVG, elevationSVG } from '../cm/drawing';
+  import { DEFAULT_CONFIG, normalise, encode, decode, type Config } from '../cm/options';
+  import { describe, summaryLine } from '../cm/describe';
+
+  const T = (window as unknown as { __cmBuilderText: { messages: Record<string, string>; copied: string; share: string } }).__cmBuilderText;
+  const form = document.querySelector<HTMLFormElement>('[data-builder]')!;
+  const elev = form.querySelector<HTMLElement>('[data-elevation]')!;
+  const plan = form.querySelector<HTMLElement>('[data-plan]')!;
+  const spec = form.querySelector<HTMLElement>('[data-spec]')!;
+  const hint = form.querySelector<HTMLElement>('[data-hint]')!;
+  const mount = form.querySelector<HTMLElement>('[data-mount]')!;
+  const sketchLine = document.querySelector<HTMLElement>('[data-sketch-line]')!;
+  const include = document.querySelector<HTMLInputElement>('[data-include]')!;
+  const cfgText = document.querySelector<HTMLInputElement>('[data-config-text]')!;
+  const cfgCode = document.querySelector<HTMLInputElement>('[data-config-code]')!;
+  const mobileBar = document.querySelector<HTMLElement>('[data-mobile-bar]')!;
+  const mobileLine = document.querySelector<HTMLElement>('[data-mobile-line]')!;
+
+  const radio = (name: string) => form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value;
+  const box = (name: string) => form.querySelector<HTMLInputElement>(`input[name="${name}"]`)!;
+
+  function read(): Config {
+    return {
+      setting: (radio('setting') ?? 'indoor') as Config['setting'],
+      scope: (radio('scope') ?? 'grand') as Config['scope'],
+      size: (radio('size') ?? 'small') as Config['size'],
+      material: (radio('material') ?? 'glass') as Config['material'],
+      drive: (radio('drive') ?? 'belts') as Config['drive'],
+      sun: (radio('sun') ?? 'sphere') as Config['sun'],
+      controller: box('controller').checked,
+      aurora: box('aurora').checked,
+      dome: box('dome').checked,
+      domeMount: (radio('domeMount') ?? 'ceiling') as Config['domeMount'],
+      pavilion: box('pavilion').checked,
+    };
+  }
+
+  function write(c: Config) {
+    for (const k of ['setting', 'scope', 'size', 'material', 'drive', 'sun', 'domeMount'] as const) {
+      const el = form.querySelector<HTMLInputElement>(`input[name="${k}"][value="${c[k]}"]`);
+      if (el) el.checked = true;
+    }
+    for (const k of ['controller', 'aurora', 'dome', 'pavilion'] as const) box(k).checked = c[k];
+  }
+
+  function render(c: Config) {
+    elev.innerHTML = elevationSVG(c, 'live-e');
+    plan.innerHTML = planSVG(c, 'live-p');
+    spec.innerHTML = describe(c).map((r) => `<div><dt>${r.label}</dt><dd>${r.value}</dd></div>`).join('');
+    mount.hidden = !c.dome;
+    const pav = box('pavilion');
+    pav.disabled = c.setting === 'indoor';
+    box('controller').disabled = c.aurora;
+    const code = encode(c);
+    sketchLine.textContent = summaryLine(c);
+    mobileLine.textContent = summaryLine(c);
+    cfgCode.value = include.checked ? code : '';
+    cfgText.value = include.checked ? describe(c).map((r) => `${r.label}: ${r.value}`).join('\n') : '';
+    const url = new URL(location.href);
+    url.searchParams.set('c', code);
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
+  }
+
+  function update(e?: Event) {
+    const before = read();
+    const after = normalise(before);
+    let msg = '';
+    const target = e?.target as HTMLInputElement | undefined;
+    if (before.aurora && !before.controller) msg = T.messages.auroraNeedsController;
+    if (before.pavilion && !after.pavilion) msg = T.messages.pavilionOutdoor;
+    if (target?.name === 'setting' && after.setting === 'outdoor' && !after.pavilion) msg = T.messages.outdoorSuggestPavilion;
+    write(after);
+    hint.textContent = msg;
+    render(after);
+  }
+
+  // Start from the address (?c=…), or the defaults.
+  const params = new URLSearchParams(location.search);
+  const start = decode(params.get('c')) ?? DEFAULT_CONFIG;
+  write(start);
+  render(normalise(start));
+  form.addEventListener('change', update);
+  include.addEventListener('change', () => render(normalise(read())));
+
+  // Show the phone bar while the options are on screen but the sketch isn't.
+  if ('IntersectionObserver' in window) {
+    const seen = { panel: true, steps: false };
+    const sync = () => { mobileBar.hidden = seen.panel || !seen.steps; };
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.target.id === 'sketch') seen.panel = e.isIntersecting; else seen.steps = e.isIntersecting; });
+      sync();
+    });
+    io.observe(document.getElementById('sketch')!);
+    io.observe(form.querySelector('.steps')!);
+  }
+
+  // Preselect who the enquiry is for (?for=…).
+  const forSel = document.querySelector<HTMLSelectElement>('[data-for]');
+  const forParam = params.get('for');
+  if (forSel && forParam && [...forSel.options].some((o) => o.value === forParam)) forSel.value = forParam;
+
+  // Elevation / plan tabs
+  const tabs = Array.from(form.querySelectorAll<HTMLButtonElement>('[data-view]'));
+  tabs.forEach((t) => t.addEventListener('click', () => {
+    tabs.forEach((x) => x.setAttribute('aria-selected', String(x === t)));
+    elev.hidden = t.dataset.view !== 'elevation';
+    plan.hidden = t.dataset.view !== 'plan';
+  }));
+
+  form.querySelector('[data-reset]')!.addEventListener('click', () => {
+    write(DEFAULT_CONFIG);
+    hint.textContent = '';
+    render(DEFAULT_CONFIG);
+  });
+  const shareBtn = form.querySelector<HTMLButtonElement>('[data-share]')!;
+  shareBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(location.href);
+      shareBtn.textContent = T.copied;
+      setTimeout(() => (shareBtn.textContent = T.share), 2200);
+    } catch {
+      prompt('Copy this link:', location.href);
+    }
+  });
+
+  // Enquiry form: same behaviour as the Grand Orrery contact form.
+  const enquiry = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  if (enquiry) {
+    const done = enquiry.parentElement!.querySelector<HTMLElement>('.done')!;
+    const status = enquiry.querySelector<HTMLElement>('.status')!;
+    const button = enquiry.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    enquiry.querySelector<HTMLInputElement>('input[name="t"]')!.value = String(Date.now());
+    const showDone = () => { enquiry.hidden = true; done.hidden = false; done.focus({ preventScroll: true }); };
+    if (params.has('sent')) showDone();
+    if (params.has('error')) { status.textContent = 'Please check the form and try again.'; status.classList.add('error'); }
+    const setError = (m: string) => { status.textContent = m; status.classList.add('error'); };
+    enquiry.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.classList.remove('error');
+      let firstBad: HTMLElement | null = null;
+      enquiry.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]').forEach((el) => {
+        const bad = !el.value.trim() || (el.type === 'email' && !el.checkValidity());
+        el.closest('.field')!.classList.toggle('invalid', bad);
+        el.setAttribute('aria-invalid', String(bad));
+        if (bad && !firstBad) firstBad = el;
+      });
+      if (firstBad) { setError('Please add your name, a valid email address and a few words about your space.'); (firstBad as HTMLElement).focus(); return; }
+      button.disabled = true;
+      status.textContent = 'Sending…';
+      try {
+        const res = await fetch(enquiry.action, { method: 'POST', body: new FormData(enquiry), headers: { accept: 'application/json' } });
+        const data = (await res.json().catch(() => ({}))) as { ok?: boolean; message?: string };
+        if (res.ok && data.ok) showDone();
+        else setError(data.message || 'Something went wrong. Please try again in a moment.');
+      } catch {
+        setError('We couldn’t reach the server. Check your connection and try again.');
+      } finally {
+        button.disabled = false;
+        if (!status.classList.contains('error')) status.textContent = '';
+      }
+    });
+    enquiry.addEventListener('input', (e) => {
+      const field = (e.target as HTMLElement).closest('.field');
+      if (field?.classList.contains('invalid')) field.classList.remove('invalid');
+    });
+  }
+</script>

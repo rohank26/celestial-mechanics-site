@@ -1,0 +1,34 @@
+---
+// How a commission unfolds: four numbered steps on an engraved scale.
+import home from '../../content/cm/home.json';
+interface Props { raised?: boolean }
+const { raised = false } = Astro.props;
+const p = home.process;
+const roman = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+---
+<section id="process" class:list={['section', { 'section--raised': raised }]} aria-labelledby="process-title">
+  <div class="wrap">
+    <div class="cm-head">
+      <p class="eyebrow">{p.preheader}</p>
+      <h2 id="process-title" class="h2">{p.heading}</h2>
+    </div>
+    <ol class="steps">
+      {p.steps.map((s, i) => (
+        <li>
+          <span class="num" aria-hidden="true">{roman[i] ?? i + 1}</span>
+          <h3>{s.title}</h3>
+          <p>{s.text}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .steps { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: clamp(24px, 3vw, 40px); counter-reset: step; }
+  li { position: relative; display: flex; flex-direction: column; gap: 10px; padding-top: 30px; border-top: 1px solid var(--gold); }
+  li::before { content: ''; position: absolute; top: -5px; left: 0; width: 9px; height: 9px; transform: rotate(45deg); background: var(--ink); border: 1px solid var(--gold); }
+  .num { font-family: var(--display); font-size: 0.85rem; letter-spacing: 0.2em; color: var(--gold); }
+  h3 { margin: 0; font-family: var(--display); font-weight: 500; font-size: 1.45rem; color: var(--cream); }
+  p { margin: 0; color: var(--text-soft); }
+</style>

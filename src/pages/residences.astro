@@ -1,0 +1,7 @@
+---
+// Residences page. Wording is edited in the CMS under Pages → Residences
+// (src/content/cm/residences.json); the layout is src/components/cm/AudiencePage.astro.
+import AudiencePage from '../components/cm/AudiencePage.astro';
+import content from '../content/cm/residences.json';
+---
+<AudiencePage audience="residence" current="residences" title="Residences" content={content} />

@@ -1,0 +1,70 @@
+---
+// Studio page: mission, craft and process, without bios. Wording is edited in
+// the CMS under Pages → Studio (src/content/cm/studio.json).
+import Layout from '../components/cm/Layout.astro';
+import Icon from '../components/cm/Icon.astro';
+import Process from '../components/cm/Process.astro';
+import Closing from '../components/cm/Closing.astro';
+import { planSVG } from '../cm/drawing';
+import { DEFAULT_CONFIG } from '../cm/options';
+import d from '../content/cm/studio.json';
+const icons = ['mechanism', 'craft', 'unique', 'lasting'];
+---
+<Layout title="Studio" current="studio" description={d.lead}>
+  <main>
+    <section class="cm-hero" aria-labelledby="page-title">
+      <div class="wrap">
+        <div class="copy">
+          <p class="eyebrow">{d.preheader}</p>
+          <h1 id="page-title" class="h1">{d.heading}</h1>
+          <p class="lead">{d.lead}</p>
+        </div>
+        <div class="art">
+          <div class="drawing studio-drawing" role="img" aria-label="Engraved plan drawing of a Grand Orrery">
+            <Fragment set:html={planSVG({ ...DEFAULT_CONFIG, drive: 'gears' }, 'studio')} />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="mission-title">
+      <div class="wrap">
+        <div class="mission">
+          <p class="eyebrow">{d.mission.preheader}</p>
+          <h2 id="mission-title" class="h2">{d.mission.heading}</h2>
+          <p class="soft">{d.mission.body}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--raised" aria-labelledby="craft-title">
+      <div class="wrap">
+        <div class="cm-head">
+          <p class="eyebrow">{d.principles.preheader}</p>
+          <h2 id="craft-title" class="h2">{d.principles.heading}</h2>
+        </div>
+        <ul class="points">
+          {d.principles.items.map((p, i) => (
+            <li>
+              <Icon name={icons[i] ?? 'unique'} />
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <Process />
+
+    <Closing heading={d.closing.heading} text={d.closing.text} button={d.closing.button} />
+  </main>
+</Layout>
+
+<style>
+  .studio-drawing { width: min(100%, 440px); }
+  .mission { max-width: 46rem; display: flex; flex-direction: column; gap: 20px; }
+  .mission p { margin: 0; }
+  .mission .eyebrow { margin-bottom: -6px; }
+  .mission .soft { font-size: clamp(1.12rem, 1.4vw, 1.28rem); }
+</style>

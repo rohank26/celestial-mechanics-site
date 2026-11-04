@@ -1,0 +1,36 @@
+{
+  "preheader": "Signature configurations",
+  "heading": "Starting points, not a catalogue",
+  "intro": "A few configurations to show what's possible. We may build some of them as showpieces, but every commission is shaped around its owner, so take these as inspiration and make the piece your own.",
+  "items": [
+    {
+      "name": "The Garden Tellurion",
+      "for": "residence",
+      "text": "Earth and Moon in hand-blown glass, circling a living flame beneath a pavilion in the garden.",
+      "setting": "outdoor", "scope": "tellurion", "size": "large", "material": "glass", "drive": "gears", "sun": "fireball",
+      "controller": false, "aurora": false, "dome": false, "domeMount": "ceiling", "pavilion": true
+    },
+    {
+      "name": "The Study",
+      "for": "residence",
+      "text": "The four rocky worlds in glass for a library or study, set to any date at a touch.",
+      "setting": "indoor", "scope": "inner", "size": "small", "material": "glass", "drive": "gears", "sun": "sphere",
+      "controller": true, "aurora": false, "dome": false, "domeMount": "ceiling", "pavilion": false
+    },
+    {
+      "name": "The Atrium",
+      "for": "business",
+      "text": "A Grand Orrery suspended beneath a ceiling-hung dome of light: a landmark for a hotel lobby or headquarters.",
+      "setting": "indoor", "scope": "grand", "size": "large", "material": "glass", "drive": "belts", "sun": "sphere",
+      "controller": true, "aurora": false, "dome": true, "domeMount": "ceiling", "pavilion": false
+    },
+    {
+      "name": "The Observatory",
+      "for": "institution",
+      "text": "Every planet, the Galaxy Dome on columns and Aurora's layer of knowledge: a classroom you can walk into.",
+      "setting": "indoor", "scope": "grand", "size": "large", "material": "plastic", "drive": "belts", "sun": "sphere",
+      "controller": true, "aurora": true, "dome": true, "domeMount": "columns", "pavilion": false
+    }
+  ],
+  "button": "Start from this"
+}

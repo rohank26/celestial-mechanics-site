@@ -1,0 +1,41 @@
+{
+  "preheader": "Add-ons",
+  "heading": "Beyond the orrery",
+  "lead": "Each orrery stands complete on its own. These additions extend it: into touch, into light and knowledge, and out into the open air. Choose any combination; each is made to suit your piece.",
+  "items": {
+    "controller": {
+      "name": "Planetary Controller",
+      "tagline": "The heavens, at a touch.",
+      "body": "A touch interface for interacting with your orrery. Play planetary motion scenes, align the planets to any date in history or the future, and set the colour and brightness of each world.",
+      "features": ["Planetary motion scenes", "Align the planets to a specific date", "Colour and brightness of each planet"],
+      "note": ""
+    },
+    "aurora": {
+      "name": "Aurora",
+      "tagline": "A layer of knowledge over the real sky.",
+      "body": "Aurora is an interactive augmented-reality layer for the orrery. It adds digital information over the moving planets: their orbits, their names, other celestial objects and educational stories about each one.",
+      "features": ["Planetary orbits traced in light", "Labels for every world", "Celestial objects beyond the planets", "Educational information on each element"],
+      "note": "Requires the Planetary Controller."
+    },
+    "dome": {
+      "name": "Galaxy Dome",
+      "tagline": "A canopy of light overhead.",
+      "body": "An LED-lined dome that sits above the orrery and runs mesmerising patterns of light. Add pre-programmed tracks from our music library and the dome moves in time with the music.",
+      "features": ["Hung from the ceiling, or raised on free-standing columns as an indoor gazebo", "Mesmerising light patterns", "Music-synced tracks from our library, available to purchase"],
+      "note": ""
+    },
+    "pavilion": {
+      "name": "Celestial Pavilion",
+      "tagline": "A home for your orrery under the open sky.",
+      "body": "For outdoor installations, a gazebo-like structure that keeps the orrery safe from the elements. Its dome, columns and proportions are designed around your piece and your setting.",
+      "features": ["Protects the orrery outdoors, in every season", "Dome size, columns and details customised", "Compatible with every other add-on, together or apart"],
+      "note": "For outdoor installations."
+    }
+  },
+  "compatibility": "Every add-on works with every orrery, and with each other. Aurora needs the Planetary Controller to run.",
+  "closing": {
+    "heading": "Choose what speaks to you.",
+    "text": "Try any combination in the builder, then send it to us as the start of a conversation.",
+    "button": "Open the builder"
+  }
+}

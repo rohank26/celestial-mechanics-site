@@ -1,0 +1,33 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "celestial-mechanics-site",
+  // Astro's handler plus the enquiry form (see src/worker/).
+  "main": "./src/worker/index.ts",
+  "compatibility_date": "2026-10-25",
+  // No preview links for branches or versions: only the production site is served.
+  "preview_urls": false,
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist",
+    // Unknown addresses get the site's own "lost in space" page.
+    "not_found_handling": "404-page"
+  },
+  // Every enquiry is saved here before it's emailed. No id: Cloudflare creates
+  // the namespace on the first deploy and keeps using it after that.
+  "kv_namespaces": [
+    { "binding": "ENQUIRIES" }
+  ],
+  // Enquiry emails go to this verified address (sent from thegrandorrery.art,
+  // which has Email Routing on, until the studio has its own domain).
+  "send_email": [
+    { "name": "CONTACT_EMAIL", "destination_address": "rohank@gmail.com" }
+  ],
+  // Retry any unsent enquiries every hour (at 23 minutes past).
+  "triggers": {
+    "crons": ["23 * * * *"]
+  },
+  "observability": {
+    "enabled": true
+  }
+}

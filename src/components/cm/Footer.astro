@@ -1,0 +1,36 @@
+---
+import site from '../../content/cm/site.json';
+import { cm, PAGES } from '../../cm/paths';
+const links = [
+  [PAGES.residences, site.navResidences],
+  [PAGES.institutions, site.navInstitutions],
+  [PAGES.businesses, site.navBusinesses],
+  [PAGES.addons, site.navAddons],
+  [PAGES.studio, site.navStudio],
+  [PAGES.commission, site.navCommission],
+];
+---
+<footer class="cm-footer">
+  <div class="wrap inner">
+    <img src="/brand/cm-crest.svg" alt="Celestial Mechanics" width="860" height="1100" draggable="false" />
+    <p class="line">{site.footerLine}</p>
+    <nav aria-label="Footer">
+      <ul>
+        {links.map(([href, label]) => <li><a href={cm(href)}>{label}</a></li>)}
+        <li><a href={site.grandOrreryUrl} target="_blank" rel="noopener">The Grand Orrery<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      </ul>
+    </nav>
+    <p class="copy">{site.copyright}</p>
+  </div>
+</footer>
+
+<style>
+  .cm-footer { padding: 56px var(--gutter) clamp(48px, 6vw, 80px); border-top: 1px solid var(--line); background: var(--veil-deep); }
+  .inner { display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; }
+  img { height: clamp(170px, 20vw, 240px); width: auto; }
+  .line { margin: 0; max-width: 30rem; color: var(--text-soft); font-style: italic; }
+  ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 26px; }
+  a { font-family: var(--display); font-size: 0.76rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; }
+  a:hover { color: var(--gold-light); }
+  .copy { margin: 0; font-size: 0.95rem; color: var(--text-faint); }
+</style>

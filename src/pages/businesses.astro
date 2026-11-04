@@ -1,0 +1,7 @@
+---
+// Businesses page. Wording is edited in the CMS under Pages → Businesses
+// (src/content/cm/businesses.json); the layout is src/components/cm/AudiencePage.astro.
+import AudiencePage from '../components/cm/AudiencePage.astro';
+import content from '../content/cm/businesses.json';
+---
+<AudiencePage audience="business" current="businesses" title="Businesses" content={content} />

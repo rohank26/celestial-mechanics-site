@@ -1,0 +1,23 @@
+---
+// Page frame for every Celestial Mechanics page: the shared base (fonts,
+// animated sky, scroll reveal), the studio's header and footer.
+import Base from '../../layouts/Base.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import '../../styles/cm.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  current?: string;
+}
+const { title, description = 'Celestial Mechanics designs and hand-builds immersive, life-sized orreries for residences, institutions and businesses.', current } = Astro.props;
+const full = title === 'Celestial Mechanics' ? title : `${title} · Celestial Mechanics`;
+---
+<Base title={full} description={description}>
+  <div class="cm">
+    <Header current={current} />
+    <slot />
+    <Footer />
+  </div>
+</Base>

@@ -1,0 +1,25 @@
+{
+  "preheader": "The studio",
+  "heading": "Celestial mechanics, for the age of space",
+  "lead": "Celestial Mechanics is a design studio devoted to a single, very old idea: the solar system, made by hand and set in motion. We create immersive, life-sized orreries to bring people closer to the planets, and to spark interest in the burgeoning field of space exploration.",
+  "mission": {
+    "preheader": "Why orreries",
+    "heading": "A three-hundred-year-old invitation to look up",
+    "body": "The first orreries were built in the early 1700s to show the planets moving around the Sun, and they have been sparking wonder in drawing rooms and lecture halls ever since. We are living through a new age of space exploration, and we believe the best way to share it is the oldest: put the solar system where people can stand beside it and watch it turn."
+  },
+  "principles": {
+    "preheader": "Our craft",
+    "heading": "What every piece shares",
+    "items": [
+      { "title": "A real machine", "text": "Every planet is physically carried around its orbit at its own pace. No screens standing in for the sky: what moves before you is really moving." },
+      { "title": "Made by hand", "text": "Each orrery is designed, machined and assembled in our studio, down to the hand-blown glass of its planets." },
+      { "title": "One of a kind", "text": "We build to commission and never repeat a piece. Yours is made for one place, and it will be the only one." },
+      { "title": "Built to last", "text": "Smooth, reliable, quiet and maintainable, in that order. An orrery should turn for generations." }
+    ]
+  },
+  "closing": {
+    "heading": "Let's make something unrepeatable.",
+    "text": "Tell us about your space and what you'd like people to feel there.",
+    "button": "Begin a commission"
+  }
+}

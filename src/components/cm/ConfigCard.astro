@@ -1,0 +1,38 @@
+---
+// A signature configuration: its engraved plan, name, who it suits, a line
+// about it and a button that opens it in the builder.
+import { planSVG } from '../../cm/drawing';
+import { summaryLine } from '../../cm/describe';
+import type { Signature } from '../../cm/configs';
+import { cm, PAGES } from '../../cm/paths';
+import home from '../../content/cm/home.json';
+import data from '../../content/cm/configurations.json';
+interface Props { sig: Signature; index: number; wide?: boolean }
+const { sig, index, wide = false } = Astro.props;
+const audienceLabel = { residence: home.audiences.residence.title, institution: home.audiences.institution.title, business: home.audiences.business.title }[sig.for];
+---
+<article class:list={['frame', 'sig', { wide }]}>
+  <div class="inner">
+    <div class="drawing" role="img" aria-label={`Engraved plan drawing of ${sig.name}: ${summaryLine(sig.config)}`}>
+      <Fragment set:html={planSVG(sig.config, `sig${index}`)} />
+    </div>
+    <div class="text">
+      <p class="card-meta">For {audienceLabel.toLowerCase()}</p>
+      <h3 class="card-title">{sig.name}</h3>
+      <p class="desc">{sig.text}</p>
+      <p class="spec">{summaryLine(sig.config)}</p>
+      <a class="btn" href={`${cm(PAGES.commission)}?c=${sig.code}#builder`}>{data.button}</a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .sig .inner { display: flex; flex-direction: column; gap: 22px; }
+  .drawing { max-width: 300px; width: 82%; margin: 0 auto; }
+  .text { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; flex: 1; }
+  .desc { margin: 0; color: var(--text-soft); }
+  .spec { margin: 0 0 8px; font-style: italic; font-size: 0.98rem; color: var(--text-muted); flex: 1; }
+  .wide .inner { flex-direction: row; flex-wrap: wrap; align-items: center; gap: clamp(28px, 4vw, 56px); }
+  .wide .drawing { flex: 1 1 260px; max-width: 340px; width: auto; margin: 0; }
+  .wide .text { flex: 1.3 1 300px; }
+</style>

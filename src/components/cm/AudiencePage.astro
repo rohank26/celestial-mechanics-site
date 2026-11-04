@@ -1,0 +1,105 @@
+---
+// Template for the Residences, Institutions and Businesses pages.
+import Layout from './Layout.astro';
+import Icon from './Icon.astro';
+import ConfigCard from './ConfigCard.astro';
+import Process from './Process.astro';
+import Closing from './Closing.astro';
+import { elevationSVG } from '../../cm/drawing';
+import { findSignature, SIGNATURES } from '../../cm/configs';
+import { cm, PAGES } from '../../cm/paths';
+import type { Audience } from '../../cm/options';
+
+interface Content {
+  preheader: string; heading: string; lead: string;
+  image?: string; imageAlt?: string;
+  pointsHeading: string;
+  points: { title: string; text: string; icon?: string | null }[];
+  settingsHeading: string; settings: string[];
+  startingPoint: { heading: string; text: string; configuration: string };
+  closing: { heading: string; text: string; button: string };
+}
+interface Props { audience: Audience; current: string; title: string; content: Content }
+const { audience, current, title, content: d } = Astro.props;
+const sig = findSignature(d.startingPoint.configuration) ?? SIGNATURES.find((s) => s.for === audience) ?? SIGNATURES[0];
+const sigIndex = SIGNATURES.indexOf(sig);
+---
+<Layout title={title} current={current} description={d.lead}>
+  <main>
+    <section class="cm-hero" aria-labelledby="page-title">
+      <div class="wrap">
+        <div class="copy">
+          <p class="eyebrow">{d.preheader}</p>
+          <h1 id="page-title" class="h1">{d.heading}</h1>
+          <p class="lead">{d.lead}</p>
+          <div class="btn-row">
+            <a class="btn btn--solid" href={`${cm(PAGES.commission)}?for=${audience}`}>{d.closing.button}</a>
+          </div>
+        </div>
+        <div class="art">
+          {d.image ? (
+            <img class="photo" src={d.image} alt={d.imageAlt ?? ''} loading="eager" decoding="async" draggable="false" />
+          ) : (
+            <div class="drawing hero-drawing" role="img" aria-label={`Engraved elevation drawing of ${sig.name}`}>
+              <Fragment set:html={elevationSVG(sig.config, `hero-${audience}`)} />
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="why-title">
+      <div class="wrap">
+        <div class="cm-head">
+          <h2 id="why-title" class="h2">{d.pointsHeading}</h2>
+        </div>
+        <ul class="points">
+          {d.points.map((p) => (
+            <li>
+              {p.icon && <Icon name={p.icon} />}
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section section--raised" aria-labelledby="where-title">
+      <div class="wrap where">
+        <div class="settings">
+          <h2 id="where-title" class="h2">{d.settingsHeading}</h2>
+          <ul>
+            {d.settings.map((s) => <li>{s}</li>)}
+          </ul>
+        </div>
+        <div class="start">
+          <p class="eyebrow">{d.startingPoint.heading}</p>
+          <p class="soft">{d.startingPoint.text}</p>
+          <ConfigCard sig={sig} index={100 + sigIndex} />
+        </div>
+      </div>
+    </section>
+
+    <Process />
+
+    <Closing heading={d.closing.heading} text={d.closing.text} button={d.closing.button} href={`${PAGES.commission}?for=${audience}`} />
+  </main>
+</Layout>
+
+<style>
+  .hero-drawing { width: min(100%, 480px); }
+  .photo { display: block; width: 100%; max-width: 520px; aspect-ratio: 4 / 5; object-fit: cover; }
+  .where { display: flex; flex-wrap: wrap; gap: clamp(40px, 6vw, 96px); align-items: flex-start; }
+  .settings { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 28px; }
+  .settings ul { margin: 0; padding: 0; list-style: none; }
+  .settings li {
+    display: flex; align-items: center; gap: 16px; padding: 16px 0; border-top: 1px solid var(--bronze);
+    font-family: var(--display); font-size: 1.1rem; letter-spacing: 0.02em; color: var(--text);
+  }
+  .settings li:last-child { border-bottom: 1px solid var(--bronze); }
+  .settings li::before { content: ''; flex: none; width: 7px; height: 7px; transform: rotate(45deg); border: 1px solid var(--gold); }
+  .start { flex: 1 1 340px; min-width: 0; max-width: 30rem; display: flex; flex-direction: column; gap: 14px; }
+  .start p { margin: 0; }
+  .start :global(.sig) { margin-top: 10px; }
+</style>

@@ -1,0 +1,83 @@
+---
+import '@fontsource/cinzel/500.css';
+import '@fontsource/cinzel/600.css';
+import '../styles/global.css';
+import SkyBackdrop from '../components/SkyBackdrop.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Browser-tab icon */
+  icon?: string;
+}
+const { title, description = 'Celestial Mechanics designs and hand-builds immersive, life-sized orreries.', icon = '/brand/cm-crest.svg' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <!-- Unlisted for now: keep search engines out. -->
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="theme-color" content="#070605" />
+    <link rel="preload" href="/fonts/crimson-pro-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href={icon} type="image/svg+xml" />
+  </head>
+  <body>
+    <!-- Shared SVG patterns for the engraved tick rules -->
+    <svg aria-hidden="true" width="0" height="0" style="position: absolute">
+      <defs>
+        <pattern id="go-tick" width="12" height="12" patternUnits="userSpaceOnUse"><line x1="0.5" y1="0" x2="0.5" y2="4" stroke="#806A3C" stroke-width="1" /></pattern>
+        <pattern id="go-tick-major" width="72" height="12" patternUnits="userSpaceOnUse"><line x1="0.5" y1="0" x2="0.5" y2="9" stroke="#D8B25C" stroke-width="1" /></pattern>
+      </defs>
+    </svg>
+    <!-- Animated sky, fixed behind the page; everything else scrolls over it -->
+    <SkyBackdrop fixed />
+    <div class="page">
+      <slot />
+    </div>
+    <script is:inline>
+      // Scroll reveal (styles in global.css). Runs inline so nothing flashes before hiding.
+      (function () {
+        if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var SEL = 'h2, h3, p, dl > div, figure, .controls, .track, .dots, .title > a, .form, .cta';
+        var els = [];
+        document.querySelectorAll('main > section').forEach(function (section) {
+          var slow = section.classList.contains('hero');
+          section.querySelectorAll(SEL).forEach(function (el) {
+            // Animate whole blocks: skip anything inside an element already tagged.
+            if (el.parentElement.closest('[data-reveal]') || el.closest('.visually-hidden')) return;
+            el.setAttribute('data-reveal', slow ? 'slow' : '');
+            els.push(el);
+          });
+        });
+        // Elements that come into view together follow one another, 0.1s apart
+        // (0.3s apart in the opening section).
+        var io = new IntersectionObserver(function (entries) {
+          var i = 0;
+          entries.forEach(function (e) {
+            if (!e.isIntersecting) return;
+            var slow = e.target.getAttribute('data-reveal') === 'slow';
+            var step = slow ? 0.3 : 0.1;
+            e.target.style.setProperty('--reveal-delay', Math.min(i, 6) * step + (slow ? 0.1 : 0) + 's');
+            e.target.classList.add('is-in');
+            io.unobserve(e.target);
+            i++;
+          });
+        }, { rootMargin: '0px 0px -8% 0px' });
+        els.forEach(function (el) { io.observe(el); });
+      })();
+    </script>
+    <script>
+      // Light friction against saving or dragging images (design protection).
+      document.addEventListener('contextmenu', (e) => {
+        if (e.target instanceof HTMLImageElement) e.preventDefault();
+      });
+      document.addEventListener('dragstart', (e) => {
+        if (e.target instanceof HTMLImageElement) e.preventDefault();
+      });
+    </script>
+  </body>
+</html>

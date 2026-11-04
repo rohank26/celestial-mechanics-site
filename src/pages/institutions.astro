@@ -1,0 +1,7 @@
+---
+// Institutions page. Wording is edited in the CMS under Pages → Institutions
+// (src/content/cm/institutions.json); the layout is src/components/cm/AudiencePage.astro.
+import AudiencePage from '../components/cm/AudiencePage.astro';
+import content from '../content/cm/institutions.json';
+---
+<AudiencePage audience="institution" current="institutions" title="Institutions" content={content} />

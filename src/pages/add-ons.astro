@@ -1,0 +1,90 @@
+---
+// Add-ons page. Wording is edited in the CMS under Pages →
+// Add-ons (src/content/cm/addons.json). Each add-on is drawn by the same
+// engraved renderer the builder uses.
+import Layout from '../components/cm/Layout.astro';
+import Closing from '../components/cm/Closing.astro';
+import { elevationSVG } from '../cm/drawing';
+import { DEFAULT_CONFIG, ADDONS, encode, normalise, type AddonId, type Config } from '../cm/options';
+import { cm, PAGES } from '../cm/paths';
+import d from '../content/cm/addons.json';
+
+const items = d.items as Record<AddonId, { name: string; tagline: string; body: string; features: string[]; note?: string }>;
+const shown: Record<AddonId, Partial<Config>> = {
+  controller: { controller: true },
+  aurora: { controller: true, aurora: true },
+  dome: { dome: true, domeMount: 'columns' },
+  pavilion: { setting: 'outdoor', pavilion: true, scope: 'inner', size: 'large' },
+};
+const list = ADDONS.map((id) => {
+  const config = normalise({ ...DEFAULT_CONFIG, ...shown[id] });
+  return { id, ...items[id], config, code: encode(config) };
+});
+---
+<Layout title="Add-ons" current="addons" description={d.lead}>
+  <main>
+    <section class="cm-hero" aria-labelledby="page-title">
+      <div class="wrap">
+        <div class="copy">
+          <p class="eyebrow">{d.preheader}</p>
+          <h1 id="page-title" class="h1">{d.heading}</h1>
+          <p class="lead">{d.lead}</p>
+        </div>
+        <nav class="art jump" aria-label="Add-ons on this page">
+          <ol>
+            {list.map((a, i) => <li><a href={`#${a.id}`}><span class="n" aria-hidden="true">{['I', 'II', 'III', 'IV'][i]}</span>{a.name}</a></li>)}
+          </ol>
+        </nav>
+      </div>
+    </section>
+
+    {list.map((a, i) => (
+      <section id={a.id} class:list={['section', 'addon', { 'section--raised': i % 2 === 1, flip: i % 2 === 1 }]} aria-labelledby={`${a.id}-title`}>
+        <div class="wrap row">
+          <div class="drawing" role="img" aria-label={`Engraved elevation drawing: an orrery with the ${a.name}`}>
+            <Fragment set:html={elevationSVG(a.config, `addon-${a.id}`)} />
+          </div>
+          <div class="copy">
+            <p class="eyebrow">{a.tagline}</p>
+            <h2 id={`${a.id}-title`} class="h2">{a.name}</h2>
+            <p class="soft">{a.body}</p>
+            <ul class="features">
+              {a.features.map((f) => <li>{f}</li>)}
+            </ul>
+            {a.note && <p class="caption note">{a.note}</p>}
+            <a class="arrow-link" href={`${cm(PAGES.commission)}?c=${a.code}#builder`}>Try it in the builder<span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </section>
+    ))}
+
+    <section class="section compat-wrap">
+      <div class="wrap"><p class="compat">{d.compatibility}</p></div>
+    </section>
+
+    <Closing heading={d.closing.heading} text={d.closing.text} button={d.closing.button} href={`${PAGES.commission}#builder`} />
+  </main>
+</Layout>
+
+<style>
+  .jump ol { margin: 0; padding: 0; list-style: none; width: 100%; max-width: 24rem; }
+  .jump li { border-top: 1px solid var(--bronze); }
+  .jump li:last-child { border-bottom: 1px solid var(--bronze); }
+  .jump a { display: flex; align-items: baseline; gap: 18px; padding: 16px 4px; text-decoration: none; font-family: var(--display); font-size: 1.15rem; color: var(--text); transition: color 0.2s ease, padding 0.3s ease; }
+  .jump a:hover { color: var(--gold-light); padding-left: 10px; }
+  .jump .n { width: 2.2em; font-size: 0.8rem; letter-spacing: 0.18em; color: var(--gold); }
+
+  .addon .row { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(40px, 6vw, 96px); }
+  .addon .drawing { flex: 1 1 360px; min-width: 0; max-width: 34rem; }
+  .flip .drawing { order: 2; }
+  .addon .copy { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
+  .addon .copy p { margin: 0; }
+  .addon .eyebrow { margin-bottom: -8px; text-transform: none; letter-spacing: 0.04em; font-size: 1.05rem; font-style: italic; font-family: var(--serif); color: var(--gold); }
+  .features { margin: 0; padding: 0; list-style: none; width: 100%; }
+  .features li { display: flex; gap: 14px; align-items: baseline; padding: 11px 0; border-top: 1px solid var(--line); color: var(--text); }
+  .features li::before { content: ''; flex: none; width: 6px; height: 6px; transform: rotate(45deg) translateY(-2px); border: 1px solid var(--gold); }
+  .note { margin: 0; }
+  .compat-wrap { padding-top: 0; }
+  .compat { margin: 0 auto; max-width: 40rem; text-align: center; font-style: italic; color: var(--text-muted); }
+  @media (max-width: 48rem) { .flip .drawing { order: 0; } }
+</style>

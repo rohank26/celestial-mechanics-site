@@ -1,0 +1,23 @@
+{
+  "preheader": "For residences",
+  "heading": "A centrepiece without equal",
+  "lead": "For the great room, the library, the conservatory or the garden. An orrery is the rare object that rewards the first glance and the hundredth: guests gather around it, children ask how it works, and on quiet evenings it simply turns.",
+  "pointsHeading": "Why an orrery belongs at home",
+  "points": [
+    { "title": "Conversation, in motion", "text": "Nothing draws a room together like a solar system turning in its midst. It is art, instrument and talking point at once.", "icon": "conversation" },
+    { "title": "Indoors, or under the open sky", "text": "Set it beneath a vaulted ceiling, or in the garden inside a Celestial Pavilion built to weather the seasons.", "icon": "pavilion" },
+    { "title": "An heirloom, made for your family", "text": "Every detail is chosen with you. Add the Planetary Controller and align the planets to a birthday, a wedding, the day a child was born.", "icon": "heirloom" }
+  ],
+  "settingsHeading": "Where it belongs",
+  "settings": ["Great rooms and atriums", "Libraries and studies", "Conservatories", "Gardens and terraces", "Courtyards", "Private observatories"],
+  "startingPoint": {
+    "heading": "A starting point",
+    "text": "One of the configurations we'd suggest for a home. Use it as inspiration, or as the first sketch of your own.",
+    "configuration": "The Garden Tellurion"
+  },
+  "closing": {
+    "heading": "Imagine it in your home.",
+    "text": "Tell us about the room, or the garden, you have in mind.",
+    "button": "Begin a commission"
+  }
+}

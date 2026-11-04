@@ -1,0 +1,91 @@
+{
+  "preheader": "Commission",
+  "heading": "Sketch your orrery",
+  "lead": "Shape a first sketch of your piece below. Nothing here is final: it simply gives us a starting point, and we'll refine every detail with you, from proportions to finish.",
+  "setting": {
+    "title": "Where will it live?",
+    "intro": "",
+    "options": {
+      "indoor": { "label": "Indoors", "text": "A great room, lobby, gallery or hall." },
+      "outdoor": { "label": "Outdoors", "text": "A garden, terrace, courtyard or plaza." }
+    }
+  },
+  "groups": {
+    "scope": {
+      "title": "The system",
+      "intro": "How much of the solar system your orrery carries.",
+      "options": {
+        "tellurion": { "label": "Tellurion", "text": "The Earth, the Moon and the Sun: days, months and seasons, made visible." },
+        "inner": { "label": "Inner Planets", "text": "The Sun with Mercury, Venus, Earth and Mars: the rocky worlds." },
+        "grand": { "label": "Grand Orrery", "text": "All eight planets, with Pluto as a bonus." }
+      }
+    },
+    "size": {
+      "title": "Planet size",
+      "intro": "The scale of the worlds themselves.",
+      "options": {
+        "mini": { "label": "Mini", "text": "Delicate and jewel-like." },
+        "small": { "label": "Small", "text": "Balanced for most rooms." },
+        "large": { "label": "Large", "text": "Bold, sculptural presence." }
+      }
+    },
+    "material": {
+      "title": "Planet material",
+      "intro": "What each world is made of.",
+      "options": {
+        "plastic": { "label": "Plastic", "text": "Light and resilient, finished by hand." },
+        "glass": { "label": "Hand-blown glass", "text": "Each planet blown individually, so no two are alike." }
+      }
+    },
+    "drive": {
+      "title": "The mechanism",
+      "intro": "What sets the planets in motion.",
+      "options": {
+        "belts": { "label": "Motors and belts", "text": "An individual motor and belt for each planet: quiet, smooth and independently controllable." },
+        "gears": { "label": "Mechanical gearing", "text": "A single drive through a train of gears, in the tradition of the first orreries." }
+      }
+    },
+    "sun": {
+      "title": "The Sun",
+      "intro": "The heart of the system.",
+      "options": {
+        "sphere": { "label": "Spherical sun", "text": "A glowing sphere at the centre." },
+        "fireball": { "label": "Fireball", "text": "A live, propane-fed flame at the heart of the system. We'll work through safety and siting with you." }
+      }
+    }
+  },
+  "addonsTitle": "Add-ons",
+  "addonsIntro": "Optional. Choose any combination.",
+  "domeMount": {
+    "title": "Galaxy Dome mounting",
+    "options": {
+      "ceiling": { "label": "Hung from the ceiling", "text": "" },
+      "columns": { "label": "On free-standing columns", "text": "" }
+    }
+  },
+  "messages": {
+    "auroraNeedsController": "Aurora runs on the Planetary Controller, so we've added it.",
+    "pavilionOutdoor": "The Celestial Pavilion is for outdoor installations.",
+    "outdoorSuggestPavilion": "Outdoors? A Celestial Pavilion keeps your orrery safe from the elements."
+  },
+  "summary": {
+    "heading": "Your sketch",
+    "elevation": "Elevation",
+    "plan": "Plan",
+    "caption": "An illustrative sketch, not to scale.",
+    "button": "Enquire about this orrery",
+    "reset": "Start over",
+    "share": "Copy link to this sketch",
+    "copied": "Link copied"
+  },
+  "form": {
+    "preheader": "Enquire",
+    "heading": "Tell us about your space",
+    "intro": "Share a little about where your orrery will live and who will gather around it. We'll reply within one Earth day.",
+    "sketchLabel": "Your sketch",
+    "noSketch": "No sketch yet. That's fine: tell us what you have in mind, or use the builder above.",
+    "buttonText": "Send enquiry",
+    "successHeading": "Thank you",
+    "successText": "Your enquiry is on its way. We'll be in touch within one Earth day."
+  }
+}

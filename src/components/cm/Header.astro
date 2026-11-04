@@ -1,0 +1,93 @@
+---
+// Site header: the plaque wordmark, the page links and the commission button.
+// On narrow screens the links fold into a menu.
+import site from '../../content/cm/site.json';
+import { cm, PAGES } from '../../cm/paths';
+interface Props { current?: string }
+const { current } = Astro.props;
+const links = [
+  { id: 'residences', href: PAGES.residences, label: site.navResidences },
+  { id: 'institutions', href: PAGES.institutions, label: site.navInstitutions },
+  { id: 'businesses', href: PAGES.businesses, label: site.navBusinesses },
+  { id: 'addons', href: PAGES.addons, label: site.navAddons },
+  { id: 'studio', href: PAGES.studio, label: site.navStudio },
+];
+---
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href={cm(PAGES.home)} aria-label="Celestial Mechanics, home">
+      <img src="/brand/cm-wordmark.svg" alt="" width="820" height="440" draggable="false" />
+    </a>
+    <nav aria-label="Main">
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">
+        <span class="visually-hidden">Menu</span>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="1.4" fill="none" /></svg>
+      </button>
+      <ul id="site-menu">
+        {links.map((l) => (
+          <li><a href={cm(l.href)} aria-current={current === l.id ? 'page' : undefined}>{l.label}</a></li>
+        ))}
+        <li class="cta-item"><a class="btn btn--solid" href={cm(PAGES.commission)} aria-current={current === 'commission' ? 'page' : undefined}>{site.navCommission}</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(5, 4, 3, 0.86);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar { max-width: var(--max); margin: 0 auto; padding: 10px var(--gutter); display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .brand { display: block; flex: none; }
+  .brand img { display: block; height: 58px; width: auto; }
+  ul { margin: 0; padding: 0; list-style: none; display: flex; align-items: center; gap: clamp(16px, 2vw, 30px); }
+  ul a:not(.btn) {
+    font-family: var(--display); font-size: 0.8rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-soft); text-decoration: none; padding: 8px 0; border-bottom: 1px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  ul a:not(.btn):hover { color: var(--gold-light); }
+  ul a[aria-current='page']:not(.btn) { color: var(--gold-light); border-bottom-color: var(--gold); }
+  .cta-item .btn { min-height: 42px; padding: 0 18px; font-size: 0.76rem; }
+  .menu-toggle { display: none; }
+
+  @media (max-width: 62rem) {
+    .brand img { height: 50px; }
+    .menu-toggle {
+      display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px;
+      background: none; border: 1px solid var(--bronze); color: var(--gold-light); cursor: pointer;
+    }
+    ul {
+      display: none; position: absolute; left: 0; right: 0; top: 100%;
+      flex-direction: column; align-items: stretch; gap: 0;
+      padding: 8px var(--gutter) 24px; background: rgba(5, 4, 3, 0.97); border-bottom: 1px solid var(--line);
+    }
+    .open ul { display: flex; }
+    ul li { border-bottom: 1px solid var(--line); }
+    ul a:not(.btn) { display: block; padding: 16px 0; font-size: 0.85rem; border-bottom: 0; }
+    ul a[aria-current='page']:not(.btn) { border-bottom: 0; }
+    .cta-item { border-bottom: 0 !important; padding-top: 18px; }
+    .cta-item .btn { width: 100%; min-height: 48px; }
+  }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('.site-header nav');
+  const toggle = nav?.querySelector<HTMLButtonElement>('.menu-toggle');
+  if (nav && toggle) {
+    toggle.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.classList.contains('open')) {
+        nav.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+      }
+    });
+  }
+</script>

@@ -1,0 +1,173 @@
+---
+// Animated, illustrative orrery: an engraved degree dial, LED-style dome ribs
+// (drawn on a canvas, colour programme measured from the dome video) and eight
+// planets on arms turning at their own pace. Purely decorative.
+const C = 320; // centre in SVG units (viewBox -30 -30 700 700)
+const rad = (deg: number) => ((deg - 90) * Math.PI) / 180;
+const pt = (deg: number, r: number) => [C + r * Math.cos(rad(deg)), C + r * Math.sin(rad(deg))].map((v) => v.toFixed(1));
+
+const orbits = Array.from({ length: 8 }, (_, i) => 66 + 29 * i);
+const spokes = Array.from({ length: 16 }, (_, i) => {
+  const a = i * 22.5;
+  const [x1, y1] = pt(a, 44);
+  const [x2, y2] = pt(a, 286);
+  return { x1, y1, x2, y2 };
+});
+const ticks = Array.from({ length: 72 }, (_, i) => {
+  const a = i * 5;
+  const major = a % 30 === 0;
+  const len = major ? 14 : a % 10 === 0 ? 8 : 5;
+  const [x1, y1] = pt(a, 306);
+  const [x2, y2] = pt(a, 306 - len);
+  return { x1, y1, x2, y2, major };
+});
+const labels = Array.from({ length: 12 }, (_, i) => {
+  const a = i * 30;
+  const [x, y] = pt(a, 322);
+  return { a, x, y: (parseFloat(y) + 4).toFixed(1) };
+});
+
+// Arm length (% of box), planet size (% of arm), period (s), phase (s), surface gradient
+const planets = [
+  { arm: 9.429, size: 15.35, dur: 8.8, delay: -1.0, g: ['#E2DDD6', '#A39C93', '#5E5953'] },
+  { arm: 13.571, size: 14.93, dur: 14.2, delay: -7.9, g: ['#FBEBC4', '#E3BF7E', '#9C7A43'] },
+  { arm: 17.714, size: 13.07, dur: 18.0, delay: -6.0, g: ['#BFE0FF', '#3F86D4', '#1E4A7E'] },
+  { arm: 21.857, size: 8.6, dur: 24.7, delay: -20.6, g: ['#F2A27E', '#C2552F', '#6E2A14'] },
+  { arm: 26.0, size: 17.81, dur: 62.0, delay: -3.4, g: ['#F6E2C4', '#C99B6D', '#7A5534'] },
+  { arm: 30.143, size: 13.45, dur: 97.7, delay: -67.8, g: ['#FBEDC6', '#DDBF7C', '#8C7240'], ring: 24.18 },
+  { arm: 34.286, size: 9.27, dur: 165.0, delay: -68.7, g: ['#D9F5F7', '#7FCBD4', '#3D7F88'] },
+  { arm: 38.429, size: 7.52, dur: 231.1, delay: -211.8, g: ['#B9C8FF', '#4A69D6', '#22347A'] },
+];
+---
+<div class="diagram" role="img" aria-label="Illustrative diagram of the eight planets, each on its own arm from the sun, turning at its own pace">
+  <svg aria-hidden="true" viewBox="-30 -30 700 700">
+    {orbits.map((r) => <circle cx={C} cy={C} r={r} fill="none" stroke="#806A3C" stroke-width="1" opacity="0.28" />)}
+    {spokes.map((s) => <line {...s} stroke="#806A3C" stroke-width="1" opacity="0.5" />)}
+    <circle cx={C} cy={C} r="306" fill="none" stroke="#D8B25C" stroke-width="1" />
+    <circle cx={C} cy={C} r="286" fill="none" stroke="#806A3C" stroke-width="1" />
+    {ticks.map((t) => <line x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} stroke={t.major ? '#D8B25C' : '#806A3C'} stroke-width="1" />)}
+    {labels.map((l) => <text x={l.x} y={l.y} text-anchor="middle" class="dial-label" fill="#B3A27F">{l.a}</text>)}
+  </svg>
+  <canvas class="leds" aria-hidden="true"></canvas>
+  {planets.map((p) => (
+    <span class="arm" style={`width: ${p.arm}%; animation-duration: ${p.dur}s; animation-delay: ${p.delay}s`}>
+      <span class="planet" style={`width: ${p.size}%; background: radial-gradient(circle at 34% 32%, ${p.g[0]} 0%, ${p.g[1]} 55%, ${p.g[2]} 100%)`}></span>
+      {p.ring && <span class="ring" style={`width: ${p.ring}%; border-color: ${p.g[1]}`}></span>}
+    </span>
+  ))}
+  <span class="sun"></span>
+</div>
+
+<style>
+  .diagram { position: relative; width: 100%; max-width: 38rem; aspect-ratio: 1 / 1; margin: 0 auto; }
+  svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .dial-label { font-family: var(--display); font-size: 11px; letter-spacing: 0.04em; }
+  .leds { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  @keyframes orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .arm {
+    position: absolute; left: 50%; top: 50%; height: 1px; margin-top: -0.5px;
+    background: var(--bronze);
+    transform-origin: 0 50%;
+    animation-name: orbit; animation-timing-function: linear; animation-iteration-count: infinite;
+    will-change: transform;
+  }
+  .planet, .ring {
+    position: absolute; left: 100%; top: 50%; aspect-ratio: 1; border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .ring { border: 1.5px solid; box-sizing: border-box; }
+  .sun {
+    position: absolute; left: 50%; top: 50%; width: 11.6%; aspect-ratio: 1; border-radius: 50%;
+    background: var(--gold-light); transform: translate(-50%, -50%);
+  }
+  @media (prefers-reduced-motion: reduce) { .arm { animation-play-state: paused; } }
+</style>
+
+<script>
+  // LED dome ribs: 16 rays with colour fronts and travelling pulses.
+  const LOOP = 14;            // seconds; every layer divides into it exactly
+  const SPEED = 0.5;          // playback rate: a full loop takes 28 s
+  const PULSE = 2.8;          // each direction fires five times per loop
+  const WAVE = 0.6;           // pulse spacing along a rib, in rib lengths
+  const WIPE = WAVE / PULSE;  // colour fronts ride the inward wave
+  const KEYS: [number, number[]][] = [
+    [0, [118, 226, 78]], [2.2, [118, 226, 78]],
+    [3.0, [64, 112, 255]], [5.0, [64, 112, 255]],
+    [6.0, [128, 78, 255]], [8.6, [128, 78, 255]],
+    [9.6, [232, 70, 196]], [10.6, [232, 70, 196]],
+    [11.4, [255, 62, 58]], [12.2, [255, 122, 44]],
+    [13.2, [190, 228, 64]], [14, [118, 226, 78]],
+  ];
+  const smooth = (x: number) => x * x * (3 - 2 * x);
+  const palette = (t: number) => {
+    t = ((t % LOOP) + LOOP) % LOOP;
+    for (let i = 0; i < KEYS.length - 1; i++) {
+      const a = KEYS[i], b = KEYS[i + 1];
+      if (t >= a[0] && t <= b[0]) {
+        const u = b[0] === a[0] ? 0 : smooth((t - a[0]) / (b[0] - a[0]));
+        return [0, 1, 2].map((k) => a[1][k] + (b[1][k] - a[1][k]) * u);
+      }
+    }
+    return KEYS[0][1];
+  };
+  const train = (x: number) => { const d = ((((x % 1) + 1.5) % 1) - 0.5) / 0.12; return Math.exp(-d * d); };
+  const pulses = (s: number, t: number) => 0.75 * train(s / WAVE - t / PULSE) + train(s / WAVE + t / PULSE + 0.5);
+  const R0 = 44, R1 = 286, N = 40;
+
+  for (const c of document.querySelectorAll<HTMLCanvasElement>('.diagram .leds')) {
+    const ctx = c.getContext('2d');
+    if (!ctx) continue;
+    let W = 0, H = 0;
+    const size = () => {
+      const r = c.getBoundingClientRect();
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = Math.max(1, Math.round(r.width * dpr)); H = Math.max(1, Math.round(r.height * dpr));
+      if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
+    };
+    size();
+    new ResizeObserver(size).observe(c);
+
+    const draw = (t: number) => {
+      ctx.clearRect(0, 0, W, H);
+      const u = W / 700, cx = W / 2, cy = H / 2;
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.lineCap = 'round';
+      const stops = [];
+      for (let i = 0; i <= N; i++) {
+        const s = i / N;
+        stops.push({ s, col: palette(t - (1 - s) / WIPE), p: Math.min(1.4, pulses(s, t)) });
+      }
+      for (let k = 0; k < 16; k++) {
+        const a = ((k * 22.5 - 90) * Math.PI) / 180, ca = Math.cos(a), sa = Math.sin(a);
+        const x0 = cx + R0 * u * ca, y0 = cy + R0 * u * sa, x1 = cx + R1 * u * ca, y1 = cy + R1 * u * sa;
+        const glow = ctx.createLinearGradient(x0, y0, x1, y1);
+        const core = ctx.createLinearGradient(x0, y0, x1, y1);
+        for (const st of stops) {
+          const [r, g, b] = st.col;
+          const hot = Math.min(1, st.p) * 0.6;
+          const cr = Math.round(r + (255 - r) * hot), cg = Math.round(g + (255 - g) * hot), cb = Math.round(b + (255 - b) * hot);
+          glow.addColorStop(st.s, `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${(0.1 + 0.32 * st.p).toFixed(3)})`);
+          core.addColorStop(st.s, `rgba(${cr},${cg},${cb},${Math.min(1, 0.42 + 0.7 * st.p).toFixed(3)})`);
+        }
+        ctx.setLineDash([]);
+        ctx.strokeStyle = glow; ctx.lineWidth = 7 * u;
+        ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+        ctx.setLineDash([2.4 * u, 1.3 * u]);
+        ctx.strokeStyle = core; ctx.lineWidth = 1.8 * u;
+        ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    };
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { draw(1.0); continue; }
+    // Only animate while the diagram is on screen.
+    let raf = 0, visible = false;
+    const t0 = performance.now();
+    const tick = (now: number) => { draw((((now - t0) / 1000) * SPEED) % LOOP); raf = requestAnimationFrame(tick); };
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible && !raf) raf = requestAnimationFrame(tick);
+      if (!visible && raf) { cancelAnimationFrame(raf); raf = 0; }
+    }).observe(c);
+  }
+</script>

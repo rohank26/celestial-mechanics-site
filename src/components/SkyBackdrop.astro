@@ -1,0 +1,340 @@
+---
+// Animated sky, fixed behind the whole site: a slowly turning planisphere (star chart with
+// real constellation figures, graticule and ecliptic), a starfield that turns with it,
+// interlocking brass gears, and comets trailing the dome's LED colours.
+// Purely decorative; drawn on one canvas, kept faint behind the content.
+//   center: selector of the element the star chart is centred on
+//   clear:  selectors of text blocks to keep quiet behind (comma-separated)
+//   round:  selectors of round elements to keep quiet behind
+//   fixed:  pin to the viewport behind the whole page, so the site scrolls over it
+interface Props { center?: string; clear?: string; round?: string; fixed?: boolean; }
+const { center = '', clear = '', round = '', fixed = false } = Astro.props;
+---
+<div class:list={['backdrop', { fixed }]} aria-hidden="true">
+  <canvas data-hero-backdrop data-center={center} data-clear={clear} data-round={round}></canvas>
+</div>
+
+<style>
+  .backdrop { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  /* lvh: the tallest viewport, so phones don't re-layout as the address bar slides */
+  .backdrop.fixed { position: fixed; inset: 0 auto auto 0; width: 100%; height: 100lvh; }
+  canvas { display: block; width: 100%; height: 100%; }
+</style>
+
+<script>
+  type V2 = [number, number];
+
+  // ---- Constellations: [right ascension°, declination°] of each star, and the lines between them
+  const CONST: { stars: V2[]; lines: [number, number][] }[] = [
+    { // Ursa Major (the Big Dipper)
+      stars: [[165.9, 61.8], [165.5, 56.4], [178.5, 53.7], [183.9, 57.0], [193.5, 56.0], [201.0, 54.9], [206.9, 49.3]],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 0], [3, 4], [4, 5], [5, 6]],
+    },
+    { // Cassiopeia
+      stars: [[2.3, 59.1], [10.1, 56.5], [14.2, 60.7], [21.5, 60.2], [28.6, 63.7]],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 4]],
+    },
+    { // Orion
+      stars: [[88.8, 7.4], [81.3, 6.4], [85.2, -1.9], [84.1, -1.2], [83.0, -0.3], [86.9, -9.7], [78.6, -8.2]],
+      lines: [[0, 1], [0, 2], [1, 4], [2, 3], [3, 4], [2, 5], [4, 6]],
+    },
+    { // Cygnus
+      stars: [[310.4, 45.3], [305.6, 40.3], [292.7, 28.0], [311.6, 34.0], [296.2, 45.1]],
+      lines: [[0, 1], [1, 2], [4, 1], [1, 3]],
+    },
+    { // Leo
+      stars: [[152.1, 12.0], [151.8, 16.8], [155.0, 19.8], [154.2, 23.4], [148.2, 26.0], [146.5, 23.8], [168.5, 20.5], [177.3, 14.6], [168.6, 15.4]],
+      lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [2, 6], [6, 7], [7, 8], [8, 0]],
+    },
+    { // Scorpius
+      stars: [[241.4, -19.8], [240.1, -22.6], [239.7, -26.1], [245.3, -25.6], [247.4, -26.4], [249.0, -28.2], [252.5, -34.3], [253.1, -38.0], [253.6, -42.4], [258.0, -43.2], [264.3, -43.0], [266.9, -40.1], [265.6, -39.0]],
+      lines: [[0, 1], [1, 2], [1, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [11, 12]],
+    },
+    { // Lyra
+      stars: [[279.2, 38.8], [281.1, 39.6], [281.2, 37.6], [283.6, 36.9], [284.7, 32.7], [282.5, 33.4]],
+      lines: [[0, 1], [0, 2], [2, 3], [3, 4], [4, 5], [5, 2]],
+    },
+    { // Polaris
+      stars: [[38.0, 89.3]],
+      lines: [],
+    },
+  ];
+
+  // Dome LED colours (as in the dial's light programme)
+  const LED: number[][] = [[118, 226, 78], [64, 112, 255], [128, 78, 255], [232, 70, 196], [255, 62, 58], [255, 122, 44], [190, 228, 64]];
+
+  const DEC_MIN = -45;                 // the chart shows the sky down to −45°
+  const SKY_PERIOD = 600;              // seconds for the chart to turn once
+  const GEAR_PERIOD = 90;              // seconds for the largest gear to turn once
+  const OBLIQUITY = (23.44 * Math.PI) / 180;
+
+  function start(canvas: HTMLCanvasElement) {
+    const host = canvas.parentElement as HTMLElement | null;
+    const scope = (canvas.closest('section') as HTMLElement | null) ?? document.body;
+    const fixed = !!host && host.classList.contains('fixed');
+    const ctx = canvas.getContext('2d');
+    if (!host || !ctx) return;
+
+    let W = 0, H = 0, dpr = 1;
+    let cx = 0, cy = 0, R = 0;               // chart centre and radius (CSS px)
+    type Box = { x: number; y: number; w: number; h: number };
+    let clear: { box: Box; round: boolean; k: number }[] = [];  // areas kept quiet: headline, dial, caption
+    let stars: { a: number; r: number; s: number; tw: number; ph: number; c: string }[] = [];
+    type Gear = { x: number; y: number; n: number; rp: number; dir: number; ratio: number; phase: number };
+    let gears: Gear[] = [];
+
+    const rand = (() => { let s = 7; return () => ((s = (s * 16807) % 2147483647) / 2147483647); })();
+
+    function gearChain(x: number, y: number, rp0: number, teeth: number[], angles: number[]): Gear[] {
+      const m = (2 * rp0) / teeth[0];
+      const out: Gear[] = [{ x, y, n: teeth[0], rp: rp0, dir: 1, ratio: 1, phase: 0 }];
+      for (let i = 1; i < teeth.length; i++) {
+        const p = out[i - 1], n = teeth[i], rp = (m * n) / 2, a = angles[i - 1];
+        const g: Gear = { x: p.x + Math.cos(a) * (p.rp + rp), y: p.y + Math.sin(a) * (p.rp + rp), n, rp, dir: -p.dir, ratio: (p.ratio * p.n) / n, phase: 0 };
+        // Mesh: a tooth of the driver sits in a gap of the driven gear along the line of centres
+        g.phase = Math.PI / n + a * (1 + p.n / n) - (p.phase * p.n) / n;
+        out.push(g);
+      }
+      return out;
+    }
+
+    function layout() {
+      const r = host!.getBoundingClientRect();
+      W = Math.max(1, r.width); H = Math.max(1, r.height);
+      dpr = Math.min(1.5, window.devicePixelRatio || 1);
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+
+      const anchor = !fixed && canvas.dataset.center ? scope.querySelector(canvas.dataset.center) : null;
+      if (anchor) { const f = anchor.getBoundingClientRect(); cx = f.left - r.left + f.width / 2; cy = f.top - r.top + f.height / 2; }
+      else if (fixed) { cx = W > H ? W * 0.62 : W * 0.5; cy = W > H ? H * 0.5 : H * 0.42; }
+      else { cx = W * 0.7; cy = H * 0.5; }
+      R = Math.max(W, H) * 0.62;
+      const box = (el: Element | null): Box | null => { if (!el) return null; const b = el.getBoundingClientRect(); return { x: b.left - r.left, y: b.top - r.top, w: b.width, h: b.height }; };
+      clear = [];
+      const all = (sel?: string) => (sel && !fixed ? Array.from(scope.querySelectorAll(sel)) : []);
+      for (const el of all(canvas.dataset.clear)) { const b = box(el); if (b) clear.push({ box: b, round: false, k: 0.82 }); }
+      for (const el of all(canvas.dataset.round)) { const b = box(el); if (b) clear.push({ box: b, round: true, k: 0.6 }); }
+
+      // Starfield placed around the chart centre so it turns with the sky
+      const diag = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy));
+      const count = Math.round(Math.min(420, (W * H) / 2600));
+      stars = Array.from({ length: count }, () => {
+        const t = rand();
+        const tint = t < 0.12 ? '255,226,170' : t < 0.24 ? '190,214,255' : '255,248,232';
+        return { a: rand() * Math.PI * 2, r: Math.sqrt(rand()) * diag, s: rand() < 0.08 ? 1.6 + rand() : 0.5 + rand() * 0.9, tw: 0.4 + rand() * 1.6, ph: rand() * 6.28, c: tint };
+      });
+
+      // Gears: a train breaking in at the lower left, another at the upper right
+      const u = Math.min(W, H);
+      gears = [
+        ...gearChain(-u * 0.04, H + u * 0.06, u * 0.30, [48, 20, 32], [-0.95, -0.25]),
+        ...gearChain(W + u * 0.05, -u * 0.08, u * 0.20, [36, 16], [2.35]),
+      ];
+    }
+
+    const proj = (ra: number, dec: number, rot: number): V2 => {
+      const rr = (R * (90 - dec)) / (90 - DEC_MIN);
+      const a = (-ra * Math.PI) / 180 + rot;
+      return [cx + rr * Math.cos(a), cy + rr * Math.sin(a)];
+    };
+
+    function drawChart(rot: number) {
+      ctx!.save();
+      ctx!.lineWidth = 1;
+      // Declination circles and hour lines
+      ctx!.strokeStyle = 'rgba(128,106,60,0.22)';
+      for (const dec of [60, 30, 0, -30]) {
+        ctx!.beginPath(); ctx!.arc(cx, cy, (R * (90 - dec)) / (90 - DEC_MIN), 0, Math.PI * 2); ctx!.stroke();
+      }
+      for (let h = 0; h < 24; h += 2) {
+        const [x0, y0] = proj(h * 15, 80, rot), [x1, y1] = proj(h * 15, DEC_MIN, rot);
+        ctx!.beginPath(); ctx!.moveTo(x0, y0); ctx!.lineTo(x1, y1); ctx!.stroke();
+      }
+      // Rim with fine hour ticks
+      ctx!.strokeStyle = 'rgba(216,178,92,0.22)';
+      ctx!.beginPath(); ctx!.arc(cx, cy, R, 0, Math.PI * 2); ctx!.stroke();
+      ctx!.beginPath(); ctx!.arc(cx, cy, R * 1.025, 0, Math.PI * 2); ctx!.stroke();
+      for (let i = 0; i < 96; i++) {
+        const a = (i / 96) * Math.PI * 2 + rot, len = i % 4 === 0 ? R * 0.025 : R * 0.012;
+        ctx!.beginPath();
+        ctx!.moveTo(cx + R * Math.cos(a), cy + R * Math.sin(a));
+        ctx!.lineTo(cx + (R + len) * Math.cos(a), cy + (R + len) * Math.sin(a));
+        ctx!.stroke();
+      }
+      // Ecliptic, dashed
+      ctx!.setLineDash([6, 7]);
+      ctx!.strokeStyle = 'rgba(216,178,92,0.28)';
+      ctx!.beginPath();
+      for (let i = 0; i <= 180; i++) {
+        const l = (i / 180) * Math.PI * 2;
+        const ra = (Math.atan2(Math.sin(l) * Math.cos(OBLIQUITY), Math.cos(l)) * 180) / Math.PI;
+        const dec = (Math.asin(Math.sin(OBLIQUITY) * Math.sin(l)) * 180) / Math.PI;
+        const [x, y] = proj(ra, dec, rot);
+        if (i === 0) ctx!.moveTo(x, y); else ctx!.lineTo(x, y);
+      }
+      ctx!.stroke();
+      ctx!.setLineDash([]);
+      // Constellation figures
+      for (const c of CONST) {
+        const pts = c.stars.map(([ra, dec]) => proj(ra, dec, rot));
+        ctx!.strokeStyle = 'rgba(242,215,142,0.30)';
+        for (const [i, j] of c.lines) {
+          ctx!.beginPath(); ctx!.moveTo(pts[i][0], pts[i][1]); ctx!.lineTo(pts[j][0], pts[j][1]); ctx!.stroke();
+        }
+        ctx!.fillStyle = 'rgba(255,241,194,0.85)';
+        for (const [x, y] of pts) { ctx!.beginPath(); ctx!.arc(x, y, 1.7, 0, Math.PI * 2); ctx!.fill(); }
+      }
+      ctx!.restore();
+    }
+
+    function drawStars(t: number, rot: number) {
+      for (const s of stars) {
+        const a = s.a + rot, x = cx + s.r * Math.cos(a), y = cy + s.r * Math.sin(a);
+        if (x < -4 || y < -4 || x > W + 4 || y > H + 4) continue;
+        const k = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * s.tw + s.ph));
+        ctx!.fillStyle = `rgba(${s.c},${(0.25 + 0.6 * k).toFixed(3)})`;
+        ctx!.beginPath(); ctx!.arc(x, y, s.s, 0, Math.PI * 2); ctx!.fill();
+      }
+    }
+
+    function gearPath(g: Gear, ang: number) {
+      const n = g.n, rt = g.rp * 1.07, rr = g.rp * 0.92, step = (Math.PI * 2) / n;
+      ctx!.beginPath();
+      for (let i = 0; i < n; i++) {
+        const a = ang + i * step;
+        const pts: [number, number][] = [[a - step * 0.27, rr], [a - step * 0.13, rt], [a + step * 0.13, rt], [a + step * 0.27, rr]];
+        pts.forEach(([b, r], k) => { const x = g.x + r * Math.cos(b), y = g.y + r * Math.sin(b); if (i === 0 && k === 0) ctx!.moveTo(x, y); else ctx!.lineTo(x, y); });
+        ctx!.arc(g.x, g.y, rr, a + step * 0.27, a + step * 0.73);
+      }
+      ctx!.closePath();
+    }
+
+    function drawGears(t: number) {
+      ctx!.save();
+      ctx!.lineWidth = 1;
+      for (const g of gears) {
+        const ang = g.phase + g.dir * g.ratio * ((t / GEAR_PERIOD) * Math.PI * 2);
+        ctx!.strokeStyle = 'rgba(216,178,92,0.34)';
+        gearPath(g, ang); ctx!.stroke();
+        ctx!.strokeStyle = 'rgba(128,106,60,0.40)';
+        // Rim, hub, and spokes as cut-outs
+        ctx!.beginPath(); ctx!.arc(g.x, g.y, g.rp * 0.78, 0, Math.PI * 2); ctx!.stroke();
+        ctx!.beginPath(); ctx!.arc(g.x, g.y, g.rp * 0.16, 0, Math.PI * 2); ctx!.stroke();
+        ctx!.beginPath(); ctx!.arc(g.x, g.y, g.rp * 0.05, 0, Math.PI * 2); ctx!.stroke();
+        const spokes = g.n >= 30 ? 6 : 4;
+        for (let i = 0; i < spokes; i++) {
+          const a = ang + (i / spokes) * Math.PI * 2;
+          for (const off of [-0.035, 0.035]) {
+            const b = a + off * (g.rp > 60 ? 1 : 2);
+            ctx!.beginPath();
+            ctx!.moveTo(g.x + g.rp * 0.16 * Math.cos(b), g.y + g.rp * 0.16 * Math.sin(b));
+            ctx!.lineTo(g.x + g.rp * 0.78 * Math.cos(b), g.y + g.rp * 0.78 * Math.sin(b));
+            ctx!.stroke();
+          }
+        }
+      }
+      ctx!.restore();
+    }
+
+    // Comets: arcs around the chart centre (like light running round the dome), each a few seconds long
+    type Comet = { born: number; life: number; r0: number; r1: number; a0: number; w: number; col: number[] };
+    let comets: Comet[] = [];
+    let nextComet = 0.8;
+    const spawn = (t: number) => {
+      const dir = rand() < 0.5 ? 1 : -1;
+      comets.push({
+        born: t, life: 4 + rand() * 3,
+        r0: R * (0.45 + rand() * 0.75), r1: R * (0.25 + rand() * 0.9),
+        a0: rand() * Math.PI * 2, w: dir * (0.35 + rand() * 0.4),
+        col: LED[Math.floor(rand() * LED.length)],
+      });
+      nextComet = t + 1.6 + rand() * 2.6;
+    };
+    const cometAt = (c: Comet, age: number): V2 => {
+      const u = Math.min(1, Math.max(0, age / c.life)), r = c.r0 + (c.r1 - c.r0) * u, a = c.a0 + c.w * age;
+      return [cx + r * Math.cos(a), cy + r * Math.sin(a) * 0.82];
+    };
+    function drawComets(t: number) {
+      if (t >= nextComet && comets.length < 4) spawn(t);
+      comets = comets.filter((c) => t - c.born < c.life);
+      ctx!.save();
+      ctx!.globalCompositeOperation = 'lighter';
+      ctx!.lineCap = 'round';
+      for (const c of comets) {
+        const age = t - c.born, fade = Math.min(1, age / 0.8, (c.life - age) / 1.2);
+        const SEG = 32, TAIL = 1.9;
+        let prev = cometAt(c, age);
+        for (let i = 1; i <= SEG; i++) {
+          const p = cometAt(c, Math.max(0, age - (i / SEG) * TAIL)), k = 1 - i / SEG;
+          ctx!.strokeStyle = `rgba(${c.col[0]},${c.col[1]},${c.col[2]},${(0.75 * k * k * fade).toFixed(3)})`;
+          ctx!.lineWidth = 0.6 + 3.4 * k;
+          ctx!.beginPath(); ctx!.moveTo(prev[0], prev[1]); ctx!.lineTo(p[0], p[1]); ctx!.stroke();
+          prev = p;
+        }
+        const [hx, hy] = cometAt(c, age);
+        const g = ctx!.createRadialGradient(hx, hy, 0, hx, hy, 16);
+        g.addColorStop(0, `rgba(255,255,255,${(0.9 * fade).toFixed(3)})`);
+        g.addColorStop(0.25, `rgba(${c.col[0]},${c.col[1]},${c.col[2]},${(0.6 * fade).toFixed(3)})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx!.fillStyle = g; ctx!.beginPath(); ctx!.arc(hx, hy, 16, 0, Math.PI * 2); ctx!.fill();
+      }
+      ctx!.restore();
+    }
+
+    // Keep the headline, dial and caption readable: fade the backdrop out behind them
+    function clearBehindText() {
+      ctx!.save();
+      ctx!.globalCompositeOperation = 'destination-out';
+      for (const { box: b, round, k } of clear) {
+        const mx = b.x + b.w / 2, my = b.y + b.h / 2;
+        const pad = round ? b.w * 0.02 : Math.max(36, b.w * 0.14);
+        const rx = (round ? Math.min(b.w, b.h) / 2 : b.w / 2) + pad;
+        const ry = (round ? Math.min(b.w, b.h) / 2 : b.h / 2) + pad;
+        ctx!.save();
+        ctx!.translate(mx, my); ctx!.scale(1, ry / rx);
+        const g = ctx!.createRadialGradient(0, 0, 0, 0, 0, rx);
+        g.addColorStop(0, `rgba(0,0,0,${k})`);
+        g.addColorStop(round ? 0.85 : 0.6, `rgba(0,0,0,${k * 0.8})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx!.fillStyle = g; ctx!.beginPath(); ctx!.arc(0, 0, rx, 0, Math.PI * 2); ctx!.fill();
+        ctx!.restore();
+      }
+      ctx!.restore();
+    }
+
+    function frame(t: number) {
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx!.clearRect(0, 0, W, H);
+      const rot = (t / SKY_PERIOD) * Math.PI * 2;
+      drawStars(t, rot);
+      drawChart(rot);
+      drawGears(t);
+      drawComets(t);
+      clearBehindText();
+    }
+
+    layout();
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (still) { comets = []; frame(0); }
+
+    let visible = true, raf = 0, last = 0, clock = 0;
+    const loop = (now: number) => {
+      raf = 0;
+      if (!visible || document.hidden || still) return;
+      const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
+      last = now;
+      clock += dt;
+      frame(clock);
+      raf = requestAnimationFrame(loop);
+    };
+    const kick = () => { if (!raf && visible && !document.hidden && !still) { last = 0; raf = requestAnimationFrame(loop); } };
+
+    new IntersectionObserver((es) => { visible = es[0].isIntersecting; kick(); }).observe(host);
+    document.addEventListener('visibilitychange', kick);
+    let rt = 0;
+    new ResizeObserver(() => { clearTimeout(rt); rt = window.setTimeout(() => { layout(); if (still) frame(0); }, 120); }).observe(host);
+    kick();
+  }
+
+  document.querySelectorAll<HTMLCanvasElement>('canvas[data-hero-backdrop]').forEach(start);
+</script>

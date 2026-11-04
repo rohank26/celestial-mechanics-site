@@ -1,0 +1,22 @@
+---
+// Not found, on the Celestial Mechanics site.
+import Layout from '../components/cm/Layout.astro';
+import { cm, PAGES } from '../cm/paths';
+---
+<Layout title="Lost in space">
+  <main>
+    <section class="cm-hero" aria-labelledby="page-title">
+      <div class="wrap">
+        <div class="copy">
+          <p class="eyebrow">404</p>
+          <h1 id="page-title" class="h1">This page has drifted out of orbit.</h1>
+          <p class="lead">It may have moved, or never existed. Let's get you back to familiar skies.</p>
+          <div class="btn-row">
+            <a class="btn btn--solid" href={cm(PAGES.home)}>Return home</a>
+            <a class="btn" href={cm(PAGES.commission)}>Begin a commission</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

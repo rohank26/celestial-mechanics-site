@@ -1,0 +1,20 @@
+---
+// Closing call to action, just above the footer.
+import { cm, PAGES } from '../../cm/paths';
+interface Props { heading: string; text?: string; button: string; href?: string }
+const { heading, text, button, href = PAGES.commission } = Astro.props;
+---
+<section class="section section--raised cm-closing" aria-labelledby="closing-title">
+  <div class="wrap">
+    <svg class="crest-mark" viewBox="-60 -60 120 120" aria-hidden="true">
+      <circle r="52" fill="none" stroke="#D8B25C" stroke-width="1.5" />
+      <ellipse rx="52" ry="16" fill="none" stroke="#D8B25C" stroke-width="1.2" opacity=".8" />
+      <ellipse rx="52" ry="16" fill="none" stroke="#D8B25C" stroke-width="1.2" opacity=".8" transform="rotate(-23.4)" />
+      <ellipse rx="16" ry="52" fill="none" stroke="#806A3C" stroke-width="1.2" />
+      <circle r="9" fill="#F2D78E" />
+    </svg>
+    <h2 id="closing-title" class="h2">{heading}</h2>
+    {text && <p>{text}</p>}
+    <a class="btn btn--solid" href={href.startsWith('http') ? href : cm(href)}>{button}</a>
+  </div>
+</section>

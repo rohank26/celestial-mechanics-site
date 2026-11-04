@@ -1,0 +1,23 @@
+{
+  "preheader": "For businesses",
+  "heading": "Your values, in orbit",
+  "lead": "For hotels, commercial buildings, art galleries, botanical gardens, and the landscape and architectural firms who shape them. A Celestial Mechanics orrery is a piece of interactive art that tells your story in brass and light, and gives people a reason to come back.",
+  "pointsHeading": "Art that works as hard as you do",
+  "points": [
+    { "title": "A landmark people seek out", "text": "Lobbies, atriums and gardens become destinations. Guests photograph it, share it and return with friends.", "icon": "landmark" },
+    { "title": "Your story, told in brass and light", "text": "Curiosity, precision, a long view of the future: we design each piece to reflect and reinforce what your organisation stands for.", "icon": "story" },
+    { "title": "Made for the space-minded", "text": "For companies in aerospace, astronomy and the new space economy, there is no more fitting emblem than the solar system itself.", "icon": "rocket" }
+  ],
+  "settingsHeading": "Where it belongs",
+  "settings": ["Hotel lobbies and atriums", "Headquarters and commercial buildings", "Art galleries", "Botanical gardens", "Hospitality and retail destinations", "Landscape and architectural projects"],
+  "startingPoint": {
+    "heading": "A starting point",
+    "text": "One of the configurations we'd suggest for a lobby or atrium. Use it as inspiration, or as the first sketch of your own.",
+    "configuration": "The Atrium"
+  },
+  "closing": {
+    "heading": "Give your space a centre of gravity.",
+    "text": "Tell us about your building, your guests and your brand.",
+    "button": "Begin a commission"
+  }
+}

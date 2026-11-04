@@ -1,0 +1,162 @@
+---
+// Celestial Mechanics: home page. Wording is edited in the CMS under
+// Pages → Home (src/content/cm/home.json).
+import Layout from '../components/cm/Layout.astro';
+import Icon from '../components/cm/Icon.astro';
+import ConfigCard from '../components/cm/ConfigCard.astro';
+import Process from '../components/cm/Process.astro';
+import Closing from '../components/cm/Closing.astro';
+import OrreryDiagram from '../components/OrreryDiagram.astro';
+import TickRule from '../components/TickRule.astro';
+import home from '../content/cm/home.json';
+import site from '../content/cm/site.json';
+import configs from '../content/cm/configurations.json';
+import { SIGNATURES } from '../cm/configs';
+import { cm, PAGES, AUDIENCE_PAGE } from '../cm/paths';
+
+const h = home;
+const audiences = (['residence', 'institution', 'business'] as const).map((id) => ({ id, ...h.audiences[id], href: AUDIENCE_PAGE[id] }));
+const bespokeIcons = ['system', 'planets', 'mechanism', 'sun'];
+---
+<Layout title="Celestial Mechanics" current="home">
+  <main>
+    <section class="cm-hero home-hero" aria-labelledby="page-title">
+      <div class="wrap">
+        <div class="copy">
+          <p class="eyebrow">{h.hero.preheader}</p>
+          <h1 id="page-title" class="h1">{h.hero.heading}</h1>
+          <p class="lead">{h.hero.lead}</p>
+          <div class="btn-row">
+            <a class="btn btn--solid" href={cm(PAGES.commission)}>{h.hero.primaryButton}</a>
+            <a class="btn" href={cm(PAGES.addons)}>{h.hero.secondaryButton}</a>
+          </div>
+        </div>
+        <div class="art">
+          <img class="crest" src="/brand/cm-crest.svg" alt="The Celestial Mechanics crest: an armillary sphere around the Sun above an engraved plaque" width="860" height="1100" draggable="false" />
+        </div>
+      </div>
+    </section>
+
+    <section id="experience" class="section experience" aria-labelledby="experience-title">
+      <div class="wrap row">
+        <div class="copy">
+          <p class="eyebrow">{h.experience.preheader}</p>
+          <h2 id="experience-title" class="h2">{h.experience.heading}</h2>
+          <p class="soft">{h.experience.body}</p>
+        </div>
+        <figure>
+          <OrreryDiagram />
+          <figcaption class="caption">{h.experience.caption}</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="audiences" class="section section--raised" aria-labelledby="audiences-title">
+      <div class="wrap">
+        <div class="cm-head cm-head--center">
+          <p class="eyebrow">{h.audiences.preheader}</p>
+          <h2 id="audiences-title" class="h2">{h.audiences.heading}</h2>
+        </div>
+        <ul class="cards audience-cards">
+          {audiences.map((a) => (
+            <li class="frame">
+              <a class="inner audience" href={cm(a.href)}>
+                <Icon name={a.id} size={52} />
+                <h3 class="card-title">{a.title}</h3>
+                <p>{a.text}</p>
+                <span class="arrow-link">{a.link}<span aria-hidden="true">→</span></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section id="bespoke" class="section" aria-labelledby="bespoke-title">
+      <div class="wrap row bespoke">
+        <div class="copy">
+          <p class="eyebrow">{h.bespoke.preheader}</p>
+          <h2 id="bespoke-title" class="h2">{h.bespoke.heading}</h2>
+          <p class="soft">{h.bespoke.body}</p>
+          <a class="btn" href={cm(PAGES.commission)}>{h.bespoke.button}</a>
+        </div>
+        <ul class="points choices">
+          {h.bespoke.items.map((it, i) => (
+            <li>
+              <Icon name={bespokeIcons[i] ?? 'unique'} />
+              <h3>{it.title}</h3>
+              <p>{it.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <TickRule />
+
+    <section id="signatures" class="section" aria-labelledby="signatures-title">
+      <div class="wrap">
+        <div class="cm-head">
+          <p class="eyebrow">{configs.preheader}</p>
+          <h2 id="signatures-title" class="h2">{configs.heading}</h2>
+          <p>{configs.intro}</p>
+        </div>
+        <div class="cards sig-grid">
+          {SIGNATURES.map((s, i) => <ConfigCard sig={s} index={i} />)}
+        </div>
+      </div>
+    </section>
+
+    <Process raised />
+
+    <section id="grand-orrery" class="section" aria-labelledby="go-title">
+      <div class="wrap">
+        <div class="frame go-card">
+          <div class="inner">
+            <figure>
+              <img src={h.grandOrrery.image} alt={h.grandOrrery.imageAlt} loading="lazy" decoding="async" draggable="false" />
+            </figure>
+            <div class="copy">
+              <p class="eyebrow">{h.grandOrrery.preheader}</p>
+              <h2 id="go-title" class="h2">{h.grandOrrery.heading}</h2>
+              <p class="soft">{h.grandOrrery.body}</p>
+              <a class="btn" href={site.grandOrreryUrl} target="_blank" rel="noopener">{h.grandOrrery.button}<span class="visually-hidden"> (opens in a new tab)</span><span aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <Closing heading={h.closing.heading} text={h.closing.text} button={h.closing.button} />
+  </main>
+</Layout>
+
+<style>
+  .home-hero .crest { display: block; width: min(100%, 400px); height: auto; filter: drop-shadow(0 0 40px rgba(216, 178, 92, 0.12)); }
+  .home-hero .h1 { max-width: 12ch; }
+
+  .experience .row, .bespoke { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(40px, 6vw, 96px); }
+  .experience .copy, .bespoke .copy { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 22px; align-items: flex-start; }
+  .experience .copy p, .bespoke .copy p { margin: 0; }
+  .experience .eyebrow, .bespoke .eyebrow { margin-bottom: -10px; }
+  .experience figure { flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+  .experience figcaption { margin: 0 auto; text-align: center; }
+
+  .audience-cards { margin: 0; padding: 0; list-style: none; }
+  .audience { display: flex; flex-direction: column; gap: 14px; text-decoration: none; color: inherit; transition: background-color 0.3s ease; }
+  .audience:hover { background: rgba(216, 178, 92, 0.05); }
+  .audience p { margin: 0; color: var(--text-soft); flex: 1; }
+  .audience-cards .frame { transition: border-color 0.3s ease; }
+  .audience-cards .frame:hover { border-color: var(--gold-light); }
+
+  .choices { flex: 1.3 1 440px; min-width: 0; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+
+  .sig-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
+
+  .go-card .inner { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(28px, 5vw, 72px); padding: clamp(16px, 2vw, 24px); }
+  .go-card figure { flex: 1 1 320px; min-width: 0; }
+  .go-card img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .go-card .copy { flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 20px; align-items: flex-start; padding: clamp(8px, 2vw, 24px); }
+  .go-card .copy p { margin: 0; }
+  .go-card .eyebrow { margin-bottom: -8px; }
+</style>
