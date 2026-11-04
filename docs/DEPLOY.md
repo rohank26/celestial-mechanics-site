@@ -27,8 +27,8 @@ The site sends `noindex` to search engines and has a `robots.txt` that blocks cr
 Editors sign in through **Keystatic Cloud**, so they don't need GitHub accounts.
 
 1. Go to [keystatic.cloud](https://keystatic.cloud) and sign in.
-2. Open the **the-grand-orrery** team (the one the Grand Orrery's CMS uses) and create a project named **celestial-mechanics-site**, connected to the GitHub repository `rohank26/celestial-mechanics-site`.
-3. If you name the team or project differently, change `cloud.project` in `keystatic.config.ts` to `team/project` and push.
+2. Open the **the-grand-orrery** team (the one the Grand Orrery's CMS uses) and create a project named **celestial-mech-site** (Keystatic limits project names to 20 characters), connected to the GitHub repository `rohank26/celestial-mechanics-site`.
+3. `cloud.project` in `keystatic.config.ts` must match, as `team/project`: currently `the-grand-orrery/celestial-mech-site`. If you rename either, change it there and push.
 4. Open `https://celestial-mechanics-site.rohank.workers.dev/keystatic` and sign in.
 
 To give someone access, invite them to the team at keystatic.cloud.

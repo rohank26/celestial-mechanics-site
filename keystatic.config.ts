@@ -10,7 +10,7 @@ export default config({
   // there stay off the live site until the draft is published (merged into main).
   storage: import.meta.env.PROD ? { kind: 'cloud', branchPrefix: 'draft/' } : { kind: 'local' },
   // Keystatic Cloud project, as "team/project" (see docs/DEPLOY.md § 2).
-  cloud: { project: 'the-grand-orrery/celestial-mechanics-site' },
+  cloud: { project: 'the-grand-orrery/celestial-mech-site' },
 
   ui: {
     brand: { name: 'Celestial Mechanics' },
