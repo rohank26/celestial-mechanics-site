@@ -61,12 +61,14 @@ const bespokeIcons = ['system', 'planets', 'mechanism', 'sun'];
         </div>
         <ul class="cards audience-cards">
           {audiences.map((a) => (
-            <li class="frame">
-              <a class="inner audience" href={cm(a.href)}>
-                <Icon name={a.id} size={52} />
-                <h3 class="card-title">{a.title}</h3>
-                <p>{a.text}</p>
-                <span class="arrow-link">{a.link}<span aria-hidden="true">→</span></span>
+            <li>
+              <a class="frame audience-card" href={cm(a.href)}>
+                <div class="inner audience">
+                  <Icon name={a.id} size={52} />
+                  <h3 class="card-title">{a.title}</h3>
+                  <p>{a.text}</p>
+                  <span class="arrow-link">{a.link}<span aria-hidden="true">→</span></span>
+                </div>
               </a>
             </li>
           ))}
@@ -145,11 +147,55 @@ const bespokeIcons = ['system', 'planets', 'mechanism', 'sun'];
   .experience figcaption { margin: 0 auto; text-align: center; }
 
   .audience-cards { margin: 0; padding: 0; list-style: none; }
-  .audience { display: flex; flex-direction: column; gap: 14px; text-decoration: none; color: inherit; transition: background-color 0.3s ease; }
-  .audience:hover { background: rgba(216, 178, 92, 0.05); }
-  .audience p { margin: 0; color: var(--text-soft); flex: 1; }
-  .audience-cards .frame { transition: border-color 0.3s ease; }
-  .audience-cards .frame:hover { border-color: var(--gold-light); }
+  .audience-cards li { display: flex; }
+
+  /* Each card is one big button: it lifts and lights up on hover or keyboard
+     focus, and presses in when clicked or tapped. */
+  .audience-card {
+    display: flex; flex: 1; text-decoration: none; color: inherit; background: rgba(7, 6, 5, 0.35);
+    transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.3s ease, box-shadow 0.35s ease, background-color 0.3s ease;
+  }
+  .audience { display: flex; flex: 1; flex-direction: column; gap: 14px; transition: border-color 0.3s ease, background-color 0.3s ease; }
+  .audience p { margin: 0; color: var(--text-soft); flex: 1; transition: color 0.3s ease; }
+  .audience :global(.cm-icon) { transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.3s ease; }
+  .audience .card-title { transition: color 0.3s ease; }
+  .audience .arrow-link {
+    align-self: flex-start; padding: 9px 14px; margin: 4px 0 0 -14px;
+    border: 1px solid transparent; transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+  }
+
+  .audience-card:hover, .audience-card:focus-visible {
+    border-color: var(--gold-light);
+    background: rgba(13, 10, 6, 0.85);
+    box-shadow: 0 18px 44px -20px rgba(216, 178, 92, 0.5), 0 0 0 1px rgba(242, 215, 142, 0.25);
+    transform: translateY(-5px);
+  }
+  .audience-card:hover .audience, .audience-card:focus-visible .audience {
+    border-color: var(--gold);
+    background: radial-gradient(120% 90% at 50% 0%, rgba(216, 178, 92, 0.12), transparent 70%);
+  }
+  .audience-card:hover :global(.cm-icon), .audience-card:focus-visible :global(.cm-icon) { transform: scale(1.08); filter: drop-shadow(0 0 10px rgba(242, 215, 142, 0.45)); }
+  .audience-card:hover .card-title, .audience-card:focus-visible .card-title { color: var(--gold-pale); }
+  .audience-card:hover p, .audience-card:focus-visible p { color: var(--text); }
+  .audience-card:hover .arrow-link, .audience-card:focus-visible .arrow-link { color: #120D06; background: var(--gold); border-color: var(--gold); }
+  .audience-card:hover .arrow-link span, .audience-card:focus-visible .arrow-link span { transform: translateX(5px); }
+  .audience-card:active { transform: translateY(-1px); box-shadow: 0 8px 22px -14px rgba(216, 178, 92, 0.55), 0 0 0 1px rgba(242, 215, 142, 0.3); transition-duration: 0.08s; }
+  .audience-card:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 5px; }
+
+  /* Touch screens have no hover: keep the press only, so a card doesn't stay lit after a tap. */
+  @media (hover: none) {
+    .audience-card:hover:not(:focus-visible) { transform: none; box-shadow: none; border-color: var(--gold); background: rgba(7, 6, 5, 0.35); }
+    .audience-card:hover:not(:focus-visible) .audience { border-color: var(--bronze); background: none; }
+    .audience-card:hover:not(:focus-visible) :global(.cm-icon) { transform: none; filter: none; }
+    .audience-card:hover:not(:focus-visible) .card-title { color: var(--gold-light); }
+    .audience-card:hover:not(:focus-visible) p { color: var(--text-soft); }
+    .audience-card:hover:not(:focus-visible) .arrow-link { color: var(--gold-light); background: none; border-color: transparent; }
+    .audience-card:active { background: rgba(216, 178, 92, 0.08); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .audience-card, .audience-card:hover, .audience-card:focus-visible, .audience-card:active { transform: none; }
+    .audience-card:hover :global(.cm-icon), .audience-card:focus-visible :global(.cm-icon) { transform: none; }
+  }
 
   .choices { flex: 1.3 1 440px; min-width: 0; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
 
