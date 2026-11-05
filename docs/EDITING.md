@@ -51,6 +51,17 @@ cd ..
 FONT_DIR=fonts python3 build_cm.py out    # writes cm-crest-armillary.svg (the chosen one), -gear, -monogram and cm-wordmark.svg
 ```
 
+## Editing all the copy as one text file
+
+To review or rewrite the wording outside the CMS:
+
+```sh
+npx tsx tools/copy/copy.mts export copy.txt    # every piece of copy, page by page
+npx tsx tools/copy/copy.mts import copy.txt    # write the edited text back into src/content/cm/
+```
+
+Each piece of copy sits under a `>>` line naming where it goes. Import changes only the text, reports anything it couldn't place, and lists changes to the few texts written into the page code (form labels and the like, under "Fixed text") so they can be made by hand. Run the content check below afterwards.
+
 ## Checking content against the CMS
 
 After changing a content file or `keystatic.cm.ts` by hand, run:
