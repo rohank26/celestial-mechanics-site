@@ -11,8 +11,8 @@ export type Setting = (typeof SETTINGS)[number];
 
 export const GROUPS = {
   scope: ['tellurion', 'inner', 'grand'],
-  size: ['mini', 'small', 'large'],
-  material: ['plastic', 'glass'],
+  size: ['small', 'medium', 'large'],
+  material: ['pe', 'glass'],
   drive: ['belts', 'gears'],
   sun: ['sphere', 'fireball'],
 } as const;
@@ -45,7 +45,7 @@ export interface Config {
 export const DEFAULT_CONFIG: Config = {
   setting: 'indoor',
   scope: 'grand',
-  size: 'small',
+  size: 'medium',
   material: 'glass',
   drive: 'belts',
   sun: 'sphere',

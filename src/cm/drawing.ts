@@ -29,7 +29,7 @@ const PLANETS: Record<string, { r: number; g: [string, string, string]; label: s
   pluto: { r: 2.8, g: ['#F1E4D2', '#B9A58C', '#6B5C4A'], label: 'Pluto' },
   moon: { r: 2.4, g: ['#FFFFFF', '#CFC6AE', '#6A6250'], label: 'Moon' },
 };
-const SIZE_SCALE = { mini: 0.62, small: 0.88, large: 1.22 } as const;
+const SIZE_SCALE = { small: 0.62, medium: 0.88, large: 1.22 } as const;
 // Where each planet sits around its orbit in the plan view (degrees).
 const ANGLE: Record<string, number> = { mercury: 300, venus: 140, earth: 30, mars: 215, jupiter: 330, saturn: 160, uranus: 75, neptune: 250, pluto: 115 };
 

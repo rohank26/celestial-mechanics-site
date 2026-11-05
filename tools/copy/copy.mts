@@ -105,7 +105,7 @@ export const FIXED: [string, string, string][] = [
 
 // Builder option ids as people say them.
 const OPTION_NAMES: Record<string, string> = {
-  inner: 'Inner Planets', grand: 'Grand Orrery', glass: 'Hand-blown glass', belts: 'Motors and belts',
+  pe: 'PE material', inner: 'Inner Planets', grand: 'Grand Orrery', glass: 'Hand-blown glass', belts: 'Motors and belts',
   gears: 'Mechanical gearing', sphere: 'Spherical sun', indoor: 'Indoors', outdoor: 'Outdoors',
   ceiling: 'Hung from the ceiling', columns: 'On free-standing columns',
 };

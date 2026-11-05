@@ -14,7 +14,7 @@
       "name": "The Study",
       "for": "residence",
       "text": "The four rocky worlds in glass for a library or study, set to any date at a touch.",
-      "setting": "indoor", "scope": "inner", "size": "small", "material": "glass", "drive": "gears", "sun": "sphere",
+      "setting": "indoor", "scope": "inner", "size": "medium", "material": "glass", "drive": "gears", "sun": "sphere",
       "controller": true, "aurora": false, "dome": false, "domeMount": "ceiling", "pavilion": false
     },
     {
@@ -28,7 +28,7 @@
       "name": "The Observatory",
       "for": "institution",
       "text": "Every planet, the Galaxy Dome on columns and Aurora's layer of knowledge: a classroom you can walk into.",
-      "setting": "indoor", "scope": "grand", "size": "large", "material": "plastic", "drive": "belts", "sun": "sphere",
+      "setting": "indoor", "scope": "grand", "size": "large", "material": "pe", "drive": "belts", "sun": "sphere",
       "controller": true, "aurora": true, "dome": true, "domeMount": "columns", "pavilion": false
     }
   ],

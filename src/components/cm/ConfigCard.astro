@@ -17,7 +17,7 @@ const audienceLabel = { residence: home.audiences.residence.title, institution: 
       <Fragment set:html={planSVG(sig.config, `sig${index}`)} />
     </div>
     <div class="text">
-      <p class="card-meta">For {audienceLabel.toLowerCase()}</p>
+      <p class="card-meta">For {audienceLabel}</p>
       <h3 class="card-title">{sig.name}</h3>
       <p class="desc">{sig.text}</p>
       <p class="spec">{summaryLine(sig.config)}</p>

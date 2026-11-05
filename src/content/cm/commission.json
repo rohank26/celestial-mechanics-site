@@ -6,8 +6,14 @@
     "title": "Where will it live?",
     "intro": "",
     "options": {
-      "indoor": { "label": "Indoors", "text": "A great room, lobby, gallery or hall." },
-      "outdoor": { "label": "Outdoors", "text": "A garden, terrace, courtyard or plaza." }
+      "indoor": {
+        "label": "Indoors",
+        "text": "A great room, lobby, gallery or hall."
+      },
+      "outdoor": {
+        "label": "Outdoors",
+        "text": "A garden, terrace, courtyard or plaza."
+      }
     }
   },
   "groups": {
@@ -15,42 +21,78 @@
       "title": "The system",
       "intro": "How much of the solar system your orrery carries.",
       "options": {
-        "tellurion": { "label": "Tellurion", "text": "The Earth, the Moon and the Sun: days, months and seasons, made visible." },
-        "inner": { "label": "Inner Planets", "text": "The Sun with Mercury, Venus, Earth and Mars: the rocky worlds." },
-        "grand": { "label": "Grand Orrery", "text": "All eight planets, with Pluto as a bonus." }
+        "tellurion": {
+          "label": "Tellurion",
+          "text": "The Earth, the Moon and the Sun: days, months and seasons, made visible."
+        },
+        "inner": {
+          "label": "Inner Planets",
+          "text": "The Sun with Mercury, Venus, Earth and Mars: the rocky worlds."
+        },
+        "grand": {
+          "label": "Grand Orrery",
+          "text": "All eight planets, with Pluto as a bonus."
+        }
       }
     },
     "size": {
       "title": "Planet size",
       "intro": "The scale of the worlds themselves.",
       "options": {
-        "mini": { "label": "Mini", "text": "Delicate and jewel-like." },
-        "small": { "label": "Small", "text": "Balanced for most rooms." },
-        "large": { "label": "Large", "text": "Bold, sculptural presence." }
+        "small": {
+          "label": "Small",
+          "text": "Delicate and jewel-like."
+        },
+        "medium": {
+          "label": "Medium",
+          "text": "Balanced for most rooms."
+        },
+        "large": {
+          "label": "Large",
+          "text": "Bold, sculptural presence."
+        }
       }
     },
     "material": {
       "title": "Planet material",
       "intro": "What each world is made of.",
       "options": {
-        "plastic": { "label": "Plastic", "text": "Light and resilient, finished by hand." },
-        "glass": { "label": "Hand-blown glass", "text": "Each planet blown individually, so no two are alike." }
+        "pe": {
+          "label": "PE material",
+          "text": "Light and resilient, finished by hand."
+        },
+        "glass": {
+          "label": "Hand-blown glass",
+          "text": "Each planet blown individually, so no two are alike."
+        }
       }
     },
     "drive": {
       "title": "The mechanism",
       "intro": "What sets the planets in motion.",
       "options": {
-        "belts": { "label": "Motors and belts", "text": "An individual motor and belt for each planet: quiet, smooth and independently controllable." },
-        "gears": { "label": "Mechanical gearing", "text": "A single drive through a train of gears, in the tradition of the first orreries." }
+        "belts": {
+          "label": "Motors and belts",
+          "text": "An individual motor and belt for each planet: quiet, smooth and independently controllable."
+        },
+        "gears": {
+          "label": "Mechanical gearing",
+          "text": "A single drive through a train of gears, in the tradition of the first orreries."
+        }
       }
     },
     "sun": {
       "title": "The Sun",
       "intro": "The heart of the system.",
       "options": {
-        "sphere": { "label": "Spherical sun", "text": "A glowing sphere at the centre." },
-        "fireball": { "label": "Fireball", "text": "A live, propane-fed flame at the heart of the system. We'll work through safety and siting with you." }
+        "sphere": {
+          "label": "Spherical sun",
+          "text": "A glowing sphere at the centre."
+        },
+        "fireball": {
+          "label": "Fireball",
+          "text": "A live, propane-fed flame at the heart of the system. We'll work through safety and siting with you."
+        }
       }
     }
   },
@@ -59,8 +101,14 @@
   "domeMount": {
     "title": "Galaxy Dome mounting",
     "options": {
-      "ceiling": { "label": "Hung from the ceiling", "text": "" },
-      "columns": { "label": "On free-standing columns", "text": "" }
+      "ceiling": {
+        "label": "Hung from the ceiling",
+        "text": ""
+      },
+      "columns": {
+        "label": "On free-standing columns",
+        "text": ""
+      }
     }
   },
   "messages": {

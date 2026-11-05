@@ -372,7 +372,7 @@ const stepNo = (i: number) => ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII']
     return {
       setting: (radio('setting') ?? 'indoor') as Config['setting'],
       scope: (radio('scope') ?? 'grand') as Config['scope'],
-      size: (radio('size') ?? 'small') as Config['size'],
+      size: (radio('size') ?? 'medium') as Config['size'],
       material: (radio('material') ?? 'glass') as Config['material'],
       drive: (radio('drive') ?? 'belts') as Config['drive'],
       sun: (radio('sun') ?? 'sphere') as Config['sun'],
