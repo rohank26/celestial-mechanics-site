@@ -9,7 +9,7 @@ const roman = ['I', 'II', 'III', 'IV', 'V', 'VI'];
 <section id="process" class:list={['section', { 'section--raised': raised }]} aria-labelledby="process-title">
   <div class="wrap">
     <div class="cm-head">
-      <p class="eyebrow">{p.preheader}</p>
+      {p.preheader && <p class="eyebrow">{p.preheader}</p>}
       <h2 id="process-title" class="h2">{p.heading}</h2>
     </div>
     <ol class="steps">
